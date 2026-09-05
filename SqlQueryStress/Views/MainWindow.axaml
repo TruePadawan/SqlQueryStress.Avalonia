@@ -8,5 +8,31 @@
         x:Class="SqlQueryStress.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="SqlQueryStress">
-        <views:MainView />
+    <views:MainView />
+
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="_File">
+                <NativeMenu>
+                    <NativeMenuItem Header="_Options" />
+                    <NativeMenuItem Header="_Save Settings" />
+                    <NativeMenuItem Header="_Load Settings" />
+                    <NativeMenuItem Header="Save Benchmark">
+                        <NativeMenu>
+                            <NativeMenuItem Header="To CSV" />
+                            <NativeMenuItem Header="To Text" />
+                            <NativeMenuItem Header="To Clipboard" />
+                        </NativeMenu>
+                    </NativeMenuItem>
+                    <NativeMenuItem Header="_Exit" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Help">
+                <NativeMenu>
+                    <NativeMenuItem Header="About" />
+                </NativeMenu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
 </Window>
