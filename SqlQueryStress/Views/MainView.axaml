@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:SqlQueryStress.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="1000"
              x:Class="SqlQueryStress.Views.MainView"
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
@@ -12,9 +12,149 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <StackPanel HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Spacing="10">
-        <TextBlock Foreground="White" Text="{Binding Greeting}" />
-    </StackPanel>
+    <DockPanel>
+        <!-- App Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Options" />
+                <MenuItem Header="_Save Settings" />
+                <MenuItem Header="_Load Settings" />
+                <MenuItem Header="Save Benchmark">
+                    <MenuItem Header="To CSV" />
+                    <MenuItem Header="To Text" />
+                    <MenuItem Header="To Clipboard" />
+                </MenuItem>
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About"></MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <DockPanel Background="{DynamicResource AppBackground}">
+            <Border DockPanel.Dock="Right" Background="#F8FAFC" Margin="4,8,8,8" Padding="14">
+                <DockPanel MinWidth="500">
+                    <!-- TELEMETRY -->
+                    <StackPanel Spacing="10" DockPanel.Dock="Bottom">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Elapsed Time" />
+                            <TextBox Classes="Telemetry" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Iterations Completed" />
+                            <TextBox Classes="Telemetry" Text="0 / 1" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Client Seconds/Iteration (Avg)" />
+                            <TextBox Classes="Telemetry" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Total Exceptions" />
+                            <DockPanel HorizontalSpacing="4">
+                                <Button DockPanel.Dock="Right" Content="..." />
+                                <TextBox Classes="Telemetry" />
+                            </DockPanel>
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="*, *" RowDefinitions="*, *" RowSpacing="10" ColumnSpacing="8">
+                            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
+                                <TextBlock Text="CPU Seconds/Iteration (Avg)" />
+                                <TextBox Classes="Telemetry" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
+                                <TextBlock Text="Logical Reads/Iteration (Avg)" />
+                                <TextBox Classes="Telemetry" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Actual Seconds/Iteration (Avg)" />
+                                <TextBox Classes="Telemetry" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
+                                <TextBlock Text="Active Threads" />
+                                <TextBox Classes="Telemetry" />
+                            </StackPanel>
+                        </Grid>
+
+                    </StackPanel>
+
+                    <StackPanel Spacing="14">
+                        <Grid ColumnDefinitions="*, *" RowDefinitions="32, 44" RowSpacing="8" ColumnSpacing="8">
+                            <Button Grid.Row="0" Grid.Column="0" Content="Clean Buffers" />
+                            <Button Grid.Row="0" Grid.Column="1" Content="Free Cache" />
+                            <Button Grid.Row="1" Grid.Column="0"
+                                    Classes="GoButton"
+                                    FontWeight="Bold"
+                                    Background="SeaGreen"
+                                    Foreground="White"
+                                    Content="Go" />
+                            <Button Grid.Row="1" Grid.Column="1" Content="Cancel" />
+
+                            <Grid.Styles>
+                                <!-- Go button hover / press -->
+                                <Style Selector="Button.GoButton:pointerover /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="MediumSeaGreen" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Style>
+                                <Style Selector="Button.GoButton:pressed /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="Green" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Style>
+                            </Grid.Styles>
+                        </Grid>
+
+                        <!-- Separator -->
+                        <Rectangle Height="2" Fill="{DynamicResource SeparatorBackground}" />
+
+                        <StackPanel Spacing="8">
+                            <Button Content="Database" Height="32" />
+                            <Button Content="Parameter Substitution" Height="32" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="10">
+                            <StackPanel Spacing="4">
+                                <Label Content="Number of Iterations" Target="IterationCountTextBox" />
+                                <NumericUpDown Name="IterationCountTextBox"
+                                               Value="1"
+                                               Minimum="0"
+                                               FormatString="0"
+                                               ParsingNumberStyle="Integer" />
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <Label Content="Number of Threads" Target="ThreadsCountTextBox" />
+                                <NumericUpDown Name="ThreadsCountTextBox"
+                                               Value="1"
+                                               Minimum="0"
+                                               FormatString="0"
+                                               ParsingNumberStyle="Integer" />
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <Label Content="Delay between queries (ms)" Target="QueryDelayTextBox" />
+                                <NumericUpDown Name="QueryDelayTextBox"
+                                               Value="0"
+                                               Minimum="0"
+                                               FormatString="0"
+                                               ParsingNumberStyle="Integer" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Separator -->
+                        <Rectangle Height="2" Fill="{DynamicResource SeparatorBackground}" />
+
+                        <!-- ProgressBar -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Progress" FontWeight="SemiBold" />
+                            <ProgressBar Height="20" Background="LightGray" />
+                        </StackPanel>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+            <Panel Background="BurlyWood" Margin="8, 8, 4, 8"></Panel>
+        </DockPanel>
+    </DockPanel>
 </ContentPage>
