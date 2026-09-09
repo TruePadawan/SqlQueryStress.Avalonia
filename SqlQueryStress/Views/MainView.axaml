@@ -16,7 +16,7 @@
         <!-- App Menu -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Options" />
+                <MenuItem Name="OptionsMenuItem" Header="_Options" Click="OptionsMenuItem_OnClick" />
                 <MenuItem Header="_Save Settings" />
                 <MenuItem Header="_Load Settings" />
                 <MenuItem Header="Save Benchmark">
@@ -32,7 +32,7 @@
         </Menu>
 
         <DockPanel Background="{DynamicResource AppBackground}">
-            <Border DockPanel.Dock="Right" Background="#F8FAFC" Margin="4,8,8,8" Padding="14">
+            <Border DockPanel.Dock="Right" Background="{DynamicResource PanelBackground}" Margin="4,8,8,8" Padding="14">
                 <DockPanel MinWidth="500">
                     <!-- TELEMETRY -->
                     <StackPanel Spacing="10" DockPanel.Dock="Bottom">
@@ -43,7 +43,7 @@
 
                         <StackPanel Spacing="4">
                             <TextBlock Text="Iterations Completed" />
-                            <TextBox Classes="Telemetry" Text="0 / 1" />
+                            <TextBox Classes="Telemetry" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">

@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="SqlQueryStress.Views.OptionsWindow"
+        Title="Options"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource PanelBackground}">
+
+    <DockPanel Margin="16">
+
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8"
+                    Margin="0,16,0,0">
+            <Button Name="OkButton" Content="OK" Width="80" Click="OkButton_OnClick" />
+            <Button Name="CancelButton" Content="Cancel" Width="80" Click="CancelButton_OnClick" />
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*, *" ColumnSpacing="16">
+
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top" Text="Connection Options" FontWeight="SemiBold" />
+
+                <Border Margin="0, 8, 0, 0"
+                        Padding="10"
+                        BorderBrush="LightGray"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <StackPanel Spacing="4">
+                            <Label Content="Connection Timeout" />
+                            <NumericUpDown Name="ConnectionTimeoutUpDown"
+                                           Value="15"
+                                           Minimum="0"
+                                           Maximum="3600"
+                                           FormatString="0"
+                                           ParsingNumberStyle="Integer" />
+                        </StackPanel>
+
+                        <CheckBox Name="EnableConnectionPoolingCheckBox"
+                                  IsChecked="True"
+                                  Content="Enable Connection Pooling" />
+                    </StackPanel>
+
+                </Border>
+            </DockPanel>
+
+            <DockPanel Grid.Column="1">
+                <TextBlock DockPanel.Dock="Top" Text="Command Options" FontWeight="SemiBold" />
+
+                <Border Margin="0, 8, 0, 0"
+                        Padding="10"
+                        BorderBrush="LightGray"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <StackPanel Spacing="4">
+                            <Label Content="Command Timeout (0 = Unlimited)" />
+                            <NumericUpDown Name="CommandTimeoutUpDown"
+                                           Value="0"
+                                           Minimum="0"
+                                           FormatString="0"
+                                           ParsingNumberStyle="Integer" />
+                        </StackPanel>
+
+                        <CheckBox Name="CollectIoStatisticsCheckBox"
+                                  IsChecked="True"
+                                  Content="Collect I/O Statistics" />
+
+                        <CheckBox Name="CollectTimeStatisticsCheckBox"
+                                  IsChecked="True"
+                                  Content="Collect Time Statistics" />
+
+                        <CheckBox Name="ForceClientRetrievalCheckBox"
+                                  IsChecked="False"
+                                  Content="Force Client Retrieval of Data" />
+
+                        <CheckBox Name="KillQueriesOnCancelCheckBox"
+                                  IsChecked="True"
+                                  Content="Kill Queries on Cancel" />
+
+                    </StackPanel>
+                </Border>
+            </DockPanel>
+
+        </Grid>
+    </DockPanel>
+</Window>

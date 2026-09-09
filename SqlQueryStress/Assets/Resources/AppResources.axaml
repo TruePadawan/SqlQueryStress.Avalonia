@@ -3,4 +3,5 @@
     <SolidColorBrush x:Key="SeparatorBackground" Color="#CBD5E1" />
     <SolidColorBrush x:Key="ButtonBorderBrush" Color="#CBD5E1" />
     <SolidColorBrush x:Key="AppBackground" Color="#E2E8F0" />
+    <SolidColorBrush x:Key="PanelBackground" Color="#F8FAFC" />
 </ResourceDictionary>
