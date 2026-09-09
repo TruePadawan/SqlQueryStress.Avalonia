@@ -31,8 +31,14 @@
             </MenuItem>
         </Menu>
 
-        <DockPanel Background="{DynamicResource AppBackground}">
-            <Border DockPanel.Dock="Right" Background="{DynamicResource PanelBackground}" Margin="4,8,8,8" Padding="14">
+        <DockPanel Background="{DynamicResource AppBackgroundBrush}">
+            <Border DockPanel.Dock="Right"
+                    Background="{DynamicResource PanelBackgroundBrush}"
+                    BorderBrush="{DynamicResource PanelBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource PanelCornerRadius}"
+                    Margin="4,8,8,8"
+                    Padding="14">
                 <DockPanel MinWidth="500">
                     <!-- TELEMETRY -->
                     <StackPanel Spacing="10" DockPanel.Dock="Bottom">
@@ -43,7 +49,7 @@
 
                         <StackPanel Spacing="4">
                             <TextBlock Text="Iterations Completed" />
-                            <TextBox Classes="Telemetry" />
+                            <TextBox Classes="Telemetry" Text="0.0" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">
@@ -109,7 +115,7 @@
                         </Grid>
 
                         <!-- Separator -->
-                        <Rectangle Height="2" Fill="{DynamicResource SeparatorBackground}" />
+                        <Rectangle Height="2" Fill="{DynamicResource SeparatorBackgroundBrush}" />
 
                         <StackPanel Spacing="8">
                             <Button Content="Database" Height="32" />
@@ -144,17 +150,18 @@
                         </StackPanel>
 
                         <!-- Separator -->
-                        <Rectangle Height="2" Fill="{DynamicResource SeparatorBackground}" />
+                        <Rectangle Height="2" Fill="{DynamicResource SeparatorBackgroundBrush}" />
 
                         <!-- ProgressBar -->
                         <StackPanel Spacing="4">
                             <TextBlock Text="Progress" FontWeight="SemiBold" />
-                            <ProgressBar Height="20" Background="LightGray" />
+                            <ProgressBar Height="20" />
                         </StackPanel>
                     </StackPanel>
                 </DockPanel>
             </Border>
-            <Panel Background="BurlyWood" Margin="8, 8, 4, 8"></Panel>
+            <Border Background="BurlyWood" Margin="8, 8, 4, 8" CornerRadius="{DynamicResource DefaultCornerRadius}">
+            </Border>
         </DockPanel>
     </DockPanel>
 </ContentPage>

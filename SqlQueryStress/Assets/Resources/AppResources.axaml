@@ -1,7 +1,43 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <SolidColorBrush x:Key="SeparatorBackground" Color="#CBD5E1" />
-    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#CBD5E1" />
-    <SolidColorBrush x:Key="AppBackground" Color="#E2E8F0" />
-    <SolidColorBrush x:Key="PanelBackground" Color="#F8FAFC" />
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Default">
+            <SolidColorBrush x:Key="TelemetryTextBoxForegroundBrush" Color="#34D399" />
+            <CornerRadius x:Key="DefaultCornerRadius">4</CornerRadius>
+            <CornerRadius x:Key="PanelCornerRadius">6</CornerRadius>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="SeparatorBackgroundBrush" Color="#E2E8F0" />
+
+            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="ButtonHoverBackgroundBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="ButtonPressedBackgroundBrush" Color="LightGray" />
+
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#E2E8F0" />
+
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="PanelBorderBrush" Color="#CBD5E1" />
+
+            <SolidColorBrush x:Key="TelemetryTextBoxBorderBrush" Color="#1E293B" />
+            <SolidColorBrush x:Key="TelemetryTextBoxBackgroundBrush" Color="#0F172A" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="SeparatorBackgroundBrush" Color="#27272A" />
+
+            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#323238" />
+            <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#222227" />
+            <SolidColorBrush x:Key="ButtonHoverBackgroundBrush" Color="#323238" />
+            <SolidColorBrush x:Key="ButtonPressedBackgroundBrush" Color="#19191C" />
+
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#121214" />
+
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#18181B" />
+            <SolidColorBrush x:Key="PanelBorderBrush" Color="#27272A" />
+
+            <SolidColorBrush x:Key="TelemetryTextBoxBorderBrush" Color="#242429" />
+            <SolidColorBrush x:Key="TelemetryTextBoxBackgroundBrush" Color="#0D0D10" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
 </ResourceDictionary>

@@ -8,10 +8,9 @@
         SizeToContent="WidthAndHeight"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource PanelBackground}">
+        Background="{DynamicResource PanelBackgroundBrush}">
 
     <DockPanel Margin="16">
-
         <StackPanel DockPanel.Dock="Bottom"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
@@ -22,7 +21,6 @@
         </StackPanel>
 
         <Grid ColumnDefinitions="*, *" ColumnSpacing="16">
-
             <DockPanel Grid.Column="0">
                 <TextBlock DockPanel.Dock="Top" Text="Connection Options" FontWeight="SemiBold" />
 
