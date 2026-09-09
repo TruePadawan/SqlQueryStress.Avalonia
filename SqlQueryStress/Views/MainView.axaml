@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:SqlQueryStress.ViewModels"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="1000"
              x:Class="SqlQueryStress.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -49,7 +50,7 @@
 
                         <StackPanel Spacing="4">
                             <TextBlock Text="Iterations Completed" />
-                            <TextBox Classes="Telemetry" Text="0.0" />
+                            <TextBox Classes="Telemetry" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">
@@ -160,7 +161,13 @@
                     </StackPanel>
                 </DockPanel>
             </Border>
-            <Border Background="BurlyWood" Margin="8, 8, 4, 8" CornerRadius="{DynamicResource DefaultCornerRadius}">
+            <Border Background="{DynamicResource PanelBackgroundBrush}" Margin="8, 8, 4, 8"
+                    CornerRadius="{DynamicResource DefaultCornerRadius}">
+                <avaloniaEdit:TextEditor Name="Editor"
+                                         Text="SELECT"
+                                         ShowLineNumbers="True"
+                                         FontSize="16"
+                                         FontFamily="Fira Code,Cascadia Code,Consolas,Menlo,Monospace" />
             </Border>
         </DockPanel>
     </DockPanel>
