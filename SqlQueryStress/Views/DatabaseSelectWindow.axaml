@@ -1,0 +1,179 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="SqlQueryStress.Views.DatabaseSelectWindow"
+        Title="Database Select"
+        SizeToContent="Height"
+        MaxWidth="800"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource PanelBackgroundBrush}">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="8"
+                    Margin="0,16,0,0">
+            <Button Name="OkButton" Content="OK" Width="80" Click="OkButton_OnClick" />
+            <Button Name="CancelButton" Content="Cancel" Width="80" Click="CancelButton_OnClick" />
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*, *" ColumnSpacing="16">
+            <!-- Main Load Settings -->
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top" Text="Main Load Settings" FontWeight="SemiBold" />
+
+                <Border Margin="0, 8, 0, 0"
+                        Padding="10"
+                        BorderBrush="{DynamicResource SeparatorBackgroundBrush}"
+                        BorderThickness="1">
+                    <StackPanel Spacing="8" MinWidth="250">
+                        <StackPanel Spacing="4">
+                            <Label Content="Server" FontWeight="SemiBold" />
+                            <TextBox Name="MainServerTextBox" Text="(local)" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Authentication" FontWeight="SemiBold" />
+                            <ComboBox Name="MainAuthenticationComboBox" SelectedIndex="0" HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="Integrated Authentication" />
+                                <ComboBoxItem Content="SQL Server Authentication" />
+                                <ComboBoxItem Content="Azure Active Directory - Universal with MFA" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Login" />
+                            <TextBox Name="MainLoginTextBox" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Password" />
+                            <TextBox Name="MainPasswordTextBox" PasswordChar="●" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <DockPanel>
+                                <CheckBox Name="MainAutoRefreshCheckBox"
+                                          DockPanel.Dock="Right"
+                                          Content="auto-refresh"
+                                          IsChecked="True" />
+                                <Label Content="Default Database" FontWeight="SemiBold" />
+                            </DockPanel>
+                            <ComboBox Name="MainDefaultDatabaseComboBox" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <CheckBox Name="MainApplicationIntentCheckBox" Content="Application Intent" />
+
+                        <ComboBox Name="MainApplicationIntentComboBox" HorizontalAlignment="Stretch" SelectedIndex="0">
+                            <ComboBoxItem Content="ReadWrite" />
+                            <ComboBoxItem Content="ReadOnly" />
+                        </ComboBox>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Encrypt" FontWeight="SemiBold" />
+                            <ComboBox Name="MainEncryptComboBox" SelectedIndex="0" HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="False" />
+                                <ComboBoxItem Content="True" />
+                                <ComboBoxItem Content="Strict" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <CheckBox Name="MainTrustServerCertificateCheckBox"
+                                  Content="Trust Server Certificate" />
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Additional Parameters" FontWeight="SemiBold" />
+                            <TextBox Name="MainAdditionalParametersTextBox"
+                                     AcceptsReturn="True"
+                                     Height="60"
+                                     TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Button Name="MainTestConnectionButton"
+                                Content="Test Connection"
+                                HorizontalAlignment="Right"
+                                Click="MainTestConnectionButton_OnClick" />
+                    </StackPanel>
+                </Border>
+            </DockPanel>
+
+            <!-- Parameterization Settings -->
+            <DockPanel Grid.Column="1">
+                <TextBlock DockPanel.Dock="Top" Text="Parameterization Settings:" FontWeight="SemiBold" />
+
+                <Border Margin="0, 8, 0, 0"
+                        Padding="10"
+                        BorderBrush="{DynamicResource SeparatorBackgroundBrush}"
+                        BorderThickness="1">
+                    <StackPanel Spacing="8" MinWidth="250">
+                        <CheckBox Name="ShareConnectionSettingsCheckBox"
+                                  Content="Share Connection Settings"
+                                  IsChecked="True"
+                                  FontWeight="SemiBold" />
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Server" FontWeight="SemiBold" />
+                            <TextBox Name="ParamServerTextBox" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Authentication" FontWeight="SemiBold" />
+                            <ComboBox Name="ParamAuthenticationComboBox" SelectedIndex="0"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="Integrated Authentication" />
+                                <ComboBoxItem Content="SQL Server Authentication" />
+                                <ComboBoxItem Content="Azure Active Directory - Universal with MFA" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Login" />
+                            <TextBox Name="ParamLoginTextBox" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Password" />
+                            <TextBox Name="ParamPasswordTextBox" PasswordChar="●" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Default Database" FontWeight="SemiBold" />
+                            <ComboBox Name="ParamDefaultDatabaseComboBox" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <CheckBox Name="ParamApplicationIntentCheckBox" Content="Application Intent" />
+                        <ComboBox Name="ParamApplicationIntentComboBox" HorizontalAlignment="Stretch" SelectedIndex="0">
+                            <ComboBoxItem Content="ReadWrite" />
+                            <ComboBoxItem Content="ReadOnly" />
+                        </ComboBox>
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Encrypt" FontWeight="SemiBold" />
+                            <ComboBox Name="ParamEncryptComboBox" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <CheckBox Name="ParamTrustServerCertificateCheckBox"
+                                  Content="Trust Server Certificate" />
+
+                        <StackPanel Spacing="4">
+                            <Label Content="Additional Parameters" FontWeight="SemiBold" />
+                            <TextBox Name="ParamAdditionalParametersTextBox"
+                                     AcceptsReturn="True"
+                                     Height="60"
+                                     TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Button Name="ParamTestConnectionButton"
+                                Content="Test Connection"
+                                HorizontalAlignment="Right"
+                                Click="ParamTestConnectionButton_OnClick" />
+                    </StackPanel>
+                </Border>
+            </DockPanel>
+
+        </Grid>
+    </DockPanel>
+</Window>

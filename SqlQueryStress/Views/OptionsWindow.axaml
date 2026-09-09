@@ -9,7 +9,6 @@
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource PanelBackgroundBrush}">
-
     <DockPanel Margin="16">
         <StackPanel DockPanel.Dock="Bottom"
                     Orientation="Horizontal"
@@ -26,7 +25,7 @@
 
                 <Border Margin="0, 8, 0, 0"
                         Padding="10"
-                        BorderBrush="LightGray"
+                        BorderBrush="{DynamicResource SeparatorBackgroundBrush}"
                         BorderThickness="1">
                     <StackPanel>
                         <StackPanel Spacing="4">
@@ -52,7 +51,7 @@
 
                 <Border Margin="0, 8, 0, 0"
                         Padding="10"
-                        BorderBrush="LightGray"
+                        BorderBrush="{DynamicResource SeparatorBackgroundBrush}"
                         BorderThickness="1">
                     <StackPanel>
                         <StackPanel Spacing="4">

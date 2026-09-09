@@ -39,4 +39,18 @@ public partial class MainView : ContentPage
             Console.WriteLine($"Could not open Options window, {exception.Message}");
         }
     }
+
+    private async void DatabaseButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
+            var databaseSelectWindow = new DatabaseSelectWindow();
+            await databaseSelectWindow.ShowDialog(mainWindow!);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Could not open Database Select window, {exception.Message}");
+        }
+    }
 }
