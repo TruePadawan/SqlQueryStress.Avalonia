@@ -77,4 +77,27 @@ public partial class MainView : ContentPage
             Console.WriteLine($"Could not open Exceptions window, {exception.Message}");
         }
     }
+
+    private async void ParameterSubstitutionButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
+            // TODO: Replace sample data with actual parameter data from the stress test engine
+            var parameterMappings = new ObservableCollection<ParameterMapping>
+            {
+                new("@id", "", ""),
+            };
+            var parameterSubstitutionWindow = new ParameterSubstitutionWindow
+            {
+                DataContext = new ParameterSubstitutionViewModel(
+                    "SELECT object_id FROM sys.objects", parameterMappings),
+            };
+            await parameterSubstitutionWindow.ShowDialog(mainWindow!);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Could not open Parameter Substitution window, {exception.Message}");
+        }
+    }
 }

@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:SqlQueryStress.ViewModels"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        mc:Ignorable="d"
+        x:Class="SqlQueryStress.Views.ParameterSubstitutionWindow"
+        x:DataType="vm:ParameterSubstitutionViewModel"
+        Title="Parameter Substitution"
+        Width="500"
+        Height="550"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource PanelBackgroundBrush}">
+    <DockPanel Margin="16">
+        <!-- OK / Cancel buttons -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="8"
+                    Margin="0,16,0,0">
+            <Button Name="OkButton" Content="OK" Width="80" Click="OkButton_OnClick" />
+            <Button Name="CancelButton" Content="Cancel" Width="80" Click="CancelButton_OnClick" />
+        </StackPanel>
+
+        <StackPanel Spacing="12">
+            <!-- Parameter Query -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Parameter Query" FontWeight="SemiBold" />
+                <Border Background="{DynamicResource PanelBackgroundBrush}"
+                        CornerRadius="{DynamicResource DefaultCornerRadius}"
+                        BorderBrush="{DynamicResource ButtonBorderBrush}"
+                        BorderThickness="1"
+                        Height="150">
+                    <avaloniaEdit:TextEditor Name="ParameterQueryEditor"
+                                             ShowLineNumbers="True"
+                                             FontSize="14"
+                                             FontFamily="Fira Code,Cascadia Code,Consolas,Menlo,Monospace" />
+                </Border>
+            </StackPanel>
+
+            <!-- Get Columns / Database buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Name="GetColumnsButton" Content="Get Columns" Click="GetColumnsButton_OnClick" />
+                <Button Name="DatabaseButton" Content="Database" Click="DatabaseButton_OnClick" />
+            </StackPanel>
+
+            <!-- Parameter Mappings -->
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Parameter Mappings" FontWeight="SemiBold" Margin="0,0,0,4" />
+                <TableView ItemsSource="{Binding ParameterMappings}">
+                    <TableView.Columns>
+                        <TableViewColumn Header="Parameter" Binding="{Binding Parameter}" Width="*" />
+                        <TableViewColumn Header="Datatype" Binding="{Binding Datatype}" Width="*" />
+                        <TableViewColumn Header="Column" Binding="{Binding Column}" Width="*" />
+                    </TableView.Columns>
+                </TableView>
+            </DockPanel>
+        </StackPanel>
+    </DockPanel>
+</Window>
