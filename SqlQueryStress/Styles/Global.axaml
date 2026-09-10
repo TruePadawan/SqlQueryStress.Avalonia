@@ -75,8 +75,6 @@
         <Setter Property="Foreground" Value="{DynamicResource TableRowForegroundBrush}" />
     </Style>
     <Style Selector="TableViewColumnHeader">
-        <Setter Property="Background" Value="{DynamicResource TableHeaderBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource TableHeaderForegroundBrush}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <Style Selector="TableViewRow">
