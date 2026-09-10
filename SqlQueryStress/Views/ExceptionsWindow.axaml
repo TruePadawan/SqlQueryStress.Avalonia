@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:SqlQueryStress.ViewModels"
+        mc:Ignorable="d"
+        x:Class="SqlQueryStress.Views.ExceptionsWindow"
+        x:DataType="vm:ExceptionsViewModel"
+        Title="Exceptions"
+        Width="600"
+        Height="400"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource PanelBackgroundBrush}">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button Name="CloseButton" Content="Close" Width="80" Click="CloseButton_OnClick" />
+        </StackPanel>
+
+        <TableView ItemsSource="{Binding Exceptions}">
+            <TableView.Columns>
+                <TableViewColumn Header="Count" Binding="{Binding Count}" Width="80" />
+                <TableViewColumn Header="Exception" Binding="{Binding Exception}" Width="*" />
+            </TableView.Columns>
+        </TableView>
+    </DockPanel>
+</Window>

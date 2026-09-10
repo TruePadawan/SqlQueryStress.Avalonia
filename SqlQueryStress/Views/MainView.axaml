@@ -61,7 +61,8 @@
                         <StackPanel Spacing="4">
                             <TextBlock Text="Total Exceptions" />
                             <DockPanel HorizontalSpacing="4">
-                                <Button DockPanel.Dock="Right" Content="..." />
+                                <Button Name="ExceptionsButton" DockPanel.Dock="Right" Content="..."
+                                        Click="ExceptionsButton_OnClick" />
                                 <TextBox Classes="Telemetry" />
                             </DockPanel>
                         </StackPanel>

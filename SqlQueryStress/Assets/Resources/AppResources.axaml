@@ -21,6 +21,16 @@
 
             <SolidColorBrush x:Key="TelemetryTextBoxBorderBrush" Color="#1E293B" />
             <SolidColorBrush x:Key="TelemetryTextBoxBackgroundBrush" Color="#0F172A" />
+
+            <!-- TableView -->
+            <SolidColorBrush x:Key="TableHeaderBackgroundBrush" Color="#E2E8F0" />
+            <SolidColorBrush x:Key="TableHeaderForegroundBrush" Color="#1E293B" />
+            <SolidColorBrush x:Key="TableRowBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TableRowAlternateBackgroundBrush" Color="#F1F5F9" />
+            <SolidColorBrush x:Key="TableRowForegroundBrush" Color="#334155" />
+            <SolidColorBrush x:Key="TableBorderBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="TableRowSelectedBackgroundBrush" Color="#3B82F6" />
+            <SolidColorBrush x:Key="TableRowSelectedForegroundBrush" Color="#FFFFFF" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="SeparatorBackgroundBrush" Color="#27272A" />
@@ -37,6 +47,16 @@
 
             <SolidColorBrush x:Key="TelemetryTextBoxBorderBrush" Color="#242429" />
             <SolidColorBrush x:Key="TelemetryTextBoxBackgroundBrush" Color="#0D0D10" />
+
+            <!-- TableView -->
+            <SolidColorBrush x:Key="TableHeaderBackgroundBrush" Color="#27272A" />
+            <SolidColorBrush x:Key="TableHeaderForegroundBrush" Color="#E4E4E7" />
+            <SolidColorBrush x:Key="TableRowBackgroundBrush" Color="#18181B" />
+            <SolidColorBrush x:Key="TableRowAlternateBackgroundBrush" Color="#1E1E22" />
+            <SolidColorBrush x:Key="TableRowForegroundBrush" Color="#D4D4D8" />
+            <SolidColorBrush x:Key="TableBorderBrush" Color="#323238" />
+            <SolidColorBrush x:Key="TableRowSelectedBackgroundBrush" Color="#2563EB" />
+            <SolidColorBrush x:Key="TableRowSelectedForegroundBrush" Color="#FFFFFF" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 

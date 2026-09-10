@@ -65,4 +65,29 @@
     <Style Selector="TextBox.Telemetry /template/ Border#PART_BorderElement">
         <Setter Property="Background" Value="{DynamicResource TelemetryTextBoxBackgroundBrush}" />
     </Style>
+
+    <!-- TableView -->
+    <Style Selector="TableView">
+        <Setter Property="BorderBrush" Value="{DynamicResource TableBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource DefaultCornerRadius}" />
+        <Setter Property="Background" Value="{DynamicResource TableRowBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TableRowForegroundBrush}" />
+    </Style>
+    <Style Selector="TableViewColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource TableHeaderBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TableHeaderForegroundBrush}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TableViewRow">
+        <Setter Property="Background" Value="{DynamicResource TableRowBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TableRowForegroundBrush}" />
+    </Style>
+    <Style Selector="TableViewRow:selected">
+        <Setter Property="Background" Value="{DynamicResource TableRowSelectedBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TableRowSelectedForegroundBrush}" />
+    </Style>
+    <Style Selector="TableViewRow:selected /template/ ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource TableRowSelectedForegroundBrush}" />
+    </Style>
 </Styles>
