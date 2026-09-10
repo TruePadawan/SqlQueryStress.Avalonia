@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -17,4 +18,4 @@ public partial class ParameterSubstitutionViewModel : ViewModelBase
     }
 }
 
-public record ParameterMapping(string Parameter, string Datatype, string Column);
+public record ParameterMapping(string Parameter, string Datatype, List<string> Columns);

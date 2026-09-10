@@ -49,11 +49,23 @@
             <!-- Parameter Mappings -->
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="Parameter Mappings" FontWeight="SemiBold" Margin="0,0,0,4" />
-                <TableView ItemsSource="{Binding ParameterMappings}">
+                <TableView ItemsSource="{Binding ParameterMappings}" CanUserResizeColumns="False">
                     <TableView.Columns>
                         <TableViewColumn Header="Parameter" Binding="{Binding Parameter}" Width="*" />
                         <TableViewColumn Header="Datatype" Binding="{Binding Datatype}" Width="*" />
-                        <TableViewColumn Header="Column" Binding="{Binding Column}" Width="*" />
+                        <TableViewColumn Header="Column" Width="*">
+                            <TableViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding Columns}" SelectedIndex="0">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </DataTemplate>
+                            </TableViewColumn.CellTemplate>
+                        </TableViewColumn>
                     </TableView.Columns>
                 </TableView>
             </DockPanel>

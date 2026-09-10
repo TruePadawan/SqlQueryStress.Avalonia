@@ -20,7 +20,7 @@
             <Button Name="CloseButton" Content="Close" Width="80" Click="CloseButton_OnClick" />
         </StackPanel>
 
-        <TableView ItemsSource="{Binding Exceptions}">
+        <TableView ItemsSource="{Binding Exceptions}" CanUserResizeColumns="False">
             <TableView.Columns>
                 <TableViewColumn Header="Count" Binding="{Binding Count}" Width="80" />
                 <TableViewColumn Header="Exception" Binding="{Binding Exception}" Width="*" />

@@ -86,7 +86,7 @@ public partial class MainView : ContentPage
             // TODO: Replace sample data with actual parameter data from the stress test engine
             var parameterMappings = new ObservableCollection<ParameterMapping>
             {
-                new("@id", "", ""),
+                new("@id", "", ["hermes"]),
             };
             var parameterSubstitutionWindow = new ParameterSubstitutionWindow
             {

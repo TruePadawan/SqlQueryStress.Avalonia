@@ -88,4 +88,11 @@
     <Style Selector="TableViewRow:selected /template/ ContentPresenter">
         <Setter Property="Foreground" Value="{DynamicResource TableRowSelectedForegroundBrush}" />
     </Style>
+    <Style Selector="TableViewCell">
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TableViewCell ComboBox">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
 </Styles>
