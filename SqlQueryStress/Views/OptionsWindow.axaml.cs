@@ -1,9 +1,9 @@
 using Avalonia.Interactivity;
-using Avalonia.Controls;
+using SqlQueryStress.Lib;
 
 namespace SqlQueryStress.Views;
 
-public partial class OptionsWindow : Window
+public partial class OptionsWindow : ModalWindow
 {
     public OptionsWindow()
     {

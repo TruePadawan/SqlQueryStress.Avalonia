@@ -1,9 +1,9 @@
 using Avalonia.Interactivity;
-using Avalonia.Controls;
+using SqlQueryStress.Lib;
 
 namespace SqlQueryStress.Views;
 
-public partial class ExceptionsWindow : Window
+public partial class ExceptionsWindow : ModalWindow
 {
     public ExceptionsWindow()
     {

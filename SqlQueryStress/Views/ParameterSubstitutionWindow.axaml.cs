@@ -3,12 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
+using SqlQueryStress.Lib;
 using SqlQueryStress.ViewModels;
 using TextMateSharp.Grammars;
 
 namespace SqlQueryStress.Views;
 
-public partial class ParameterSubstitutionWindow : Window
+public partial class ParameterSubstitutionWindow : ModalWindow
 {
     public ParameterSubstitutionWindow()
     {
