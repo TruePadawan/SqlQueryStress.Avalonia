@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
+using Microsoft.Extensions.DependencyInjection;
 using SqlQueryStress.ViewModels;
 using TextMateSharp.Grammars;
 
@@ -33,7 +34,7 @@ public partial class MainView : ContentPage
         try
         {
             var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
-            var optionsWindow = new OptionsWindow();
+            var optionsWindow = App.ServiceProvider.GetRequiredService<OptionsWindow>();
             await optionsWindow.ShowDialog(mainWindow!);
         }
         catch (Exception exception)
