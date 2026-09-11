@@ -2,7 +2,6 @@
 <!--  <Project Path="SqlQueryStress.Android/SqlQueryStress.Android.csproj">-->
 <!--    <Deploy />-->
 <!--  </Project>-->
-  <Project Path="SqlQueryStress.Browser/SqlQueryStress.Browser.csproj" />
   <Project Path="SqlQueryStress.Desktop/SqlQueryStress.Desktop.csproj" />
 <!--  <Project Path="SqlQueryStress.iOS/SqlQueryStress.iOS.csproj">-->
 <!--    <Deploy />-->
