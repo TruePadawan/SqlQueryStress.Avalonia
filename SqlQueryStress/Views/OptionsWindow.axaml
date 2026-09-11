@@ -33,7 +33,7 @@
                         <StackPanel Spacing="4">
                             <Label Content="Connection Timeout" />
                             <NumericUpDown Name="ConnectionTimeoutUpDown"
-                                           Value="15"
+                                           Value="{Binding ConnectionTimeout}"
                                            Minimum="0"
                                            Maximum="3600"
                                            FormatString="0"
@@ -41,7 +41,7 @@
                         </StackPanel>
 
                         <CheckBox Name="EnableConnectionPoolingCheckBox"
-                                  IsChecked="True"
+                                  IsChecked="{Binding EnableConnectionPooling}"
                                   Content="Enable Connection Pooling" />
                     </StackPanel>
 
@@ -59,26 +59,26 @@
                         <StackPanel Spacing="4">
                             <Label Content="Command Timeout (0 = Unlimited)" />
                             <NumericUpDown Name="CommandTimeoutUpDown"
-                                           Value="0"
+                                           Value="{Binding CommandTimeout}"
                                            Minimum="0"
                                            FormatString="0"
                                            ParsingNumberStyle="Integer" />
                         </StackPanel>
 
                         <CheckBox Name="CollectIoStatisticsCheckBox"
-                                  IsChecked="True"
+                                  IsChecked="{Binding CollectIOStatistics}"
                                   Content="Collect I/O Statistics" />
 
                         <CheckBox Name="CollectTimeStatisticsCheckBox"
-                                  IsChecked="True"
+                                  IsChecked="{Binding CollectTimeStatistics}"
                                   Content="Collect Time Statistics" />
 
                         <CheckBox Name="ForceClientRetrievalCheckBox"
-                                  IsChecked="False"
+                                  IsChecked="{Binding ForceClientRetrievalOfData}"
                                   Content="Force Client Retrieval of Data" />
 
                         <CheckBox Name="KillQueriesOnCancelCheckBox"
-                                  IsChecked="True"
+                                  IsChecked="{Binding KillQueriesOnCancel}"
                                   Content="Kill Queries on Cancel" />
 
                     </StackPanel>

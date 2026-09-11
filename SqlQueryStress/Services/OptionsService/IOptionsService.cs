@@ -7,8 +7,6 @@ public interface IOptionsService
     bool CollectTimeStatistics { get; set; }
     bool ForceClientRetrievalOfData { get; set; }
     bool KillQueriesOnCancel { get; set; }
-
-
-    void SetConnectionTimeout(int timeout);
-    void SetCommandTimeout(int timeout);
+    int ConnectionTimeout { get; set; }
+    int CommandTimeout { get; set; }
 }

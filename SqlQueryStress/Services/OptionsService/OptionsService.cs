@@ -7,16 +7,6 @@ public class OptionsService : IOptionsService
     public bool CollectTimeStatistics { get; set; }
     public bool ForceClientRetrievalOfData { get; set; }
     public bool KillQueriesOnCancel { get; set; }
-    private int _connectionTimeout = 15;
-    private int _commandTimeout;
-
-    public void SetConnectionTimeout(int timeout)
-    {
-        _connectionTimeout = timeout;
-    }
-
-    public void SetCommandTimeout(int timeout)
-    {
-        _commandTimeout = timeout;
-    }
+    public int ConnectionTimeout { get; set; } = 15;
+    public int CommandTimeout { get; set; } = 0;
 }
