@@ -121,7 +121,8 @@
 
                         <StackPanel Spacing="8">
                             <Button Content="Database" Height="32" Click="DatabaseButton_OnClick" />
-                            <Button Name="ParameterSubstitutionButton" Content="Parameter Substitution" Height="32" Click="ParameterSubstitutionButton_OnClick" />
+                            <Button Name="ParameterSubstitutionButton" Content="Parameter Substitution" Height="32"
+                                    Click="ParameterSubstitutionButton_OnClick" />
                         </StackPanel>
 
                         <StackPanel Spacing="10">
@@ -162,8 +163,11 @@
                     </StackPanel>
                 </DockPanel>
             </Border>
-            <Border Background="{DynamicResource PanelBackgroundBrush}" Margin="8, 8, 4, 8"
-                    CornerRadius="{DynamicResource DefaultCornerRadius}">
+            <Border Background="{DynamicResource PanelBackgroundBrush}"
+                    BorderBrush="{DynamicResource PanelBorderBrush}"
+                    BorderThickness="1"
+                    Margin="8, 8, 4, 8"
+                    CornerRadius="{DynamicResource PanelCornerRadius}">
                 <avaloniaEdit:TextEditor Name="Editor"
                                          Text="SELECT"
                                          ShowLineNumbers="True"
