@@ -1,17 +1,23 @@
 using Avalonia.Interactivity;
 using SqlQueryStress.Lib;
+using SqlQueryStress.ViewModels;
 
 namespace SqlQueryStress.Views;
 
 public partial class DatabaseSelectWindow : ModalWindow
 {
-    public DatabaseSelectWindow()
+    private readonly DatabaseSelectViewModel _viewModel;
+
+    public DatabaseSelectWindow(DatabaseSelectViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = viewModel;
+        _viewModel = viewModel;
     }
 
     private void OkButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        _viewModel.ApplyChanges();
         Close();
     }
 

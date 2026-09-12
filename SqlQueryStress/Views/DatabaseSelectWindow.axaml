@@ -2,6 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:SqlQueryStress.ViewModels"
+        xmlns:models="using:SqlQueryStress.Models"
+        x:DataType="vm:DatabaseSelectViewModel"
         mc:Ignorable="d"
         x:Class="SqlQueryStress.Views.DatabaseSelectWindow"
         Title="Database Select"
@@ -32,26 +35,34 @@
                     <StackPanel Spacing="8" MinWidth="250">
                         <StackPanel Spacing="4">
                             <Label Content="Server" FontWeight="SemiBold" />
-                            <TextBox Name="MainServerTextBox" Text="(local)" />
+                            <TextBox Name="MainServerTextBox"
+                                     Text="{Binding MainServer}" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">
                             <Label Content="Authentication" FontWeight="SemiBold" />
-                            <ComboBox Name="MainAuthenticationComboBox" SelectedIndex="0" HorizontalAlignment="Stretch">
-                                <ComboBoxItem Content="Integrated Authentication" />
-                                <ComboBoxItem Content="SQL Server Authentication" />
-                                <ComboBoxItem Content="Azure Active Directory - Universal with MFA" />
+                            <ComboBox Name="MainAuthenticationComboBox"
+                                      HorizontalAlignment="Stretch"
+                                      SelectedItem="{Binding SelectedMainDbAuthenticationMode}"
+                                      ItemsSource="{Binding AuthenticationModeOptions}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:AuthenticationModeOption">
+                                        <TextBlock
+                                            Text="{Binding Label}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
                             <Label Content="Login" />
-                            <TextBox Name="MainLoginTextBox" />
+                            <TextBox Name="MainLoginTextBox" Text="{Binding MainLogin}" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">
                             <Label Content="Password" />
-                            <TextBox Name="MainPasswordTextBox" PasswordChar="●" />
+                            <TextBox Name="MainPasswordTextBox" PasswordChar="●"
+                                     Text="{Binding MainPassword}" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">
@@ -65,31 +76,32 @@
                             <ComboBox Name="MainDefaultDatabaseComboBox" HorizontalAlignment="Stretch" />
                         </StackPanel>
 
-                        <CheckBox Name="MainApplicationIntentCheckBox" Content="Application Intent" />
+                        <CheckBox Name="MainApplicationIntentCheckBox" Content="Application Intent"
+                                  IsChecked="{Binding MainApplicationIntentEnabled}" />
 
-                        <ComboBox Name="MainApplicationIntentComboBox" HorizontalAlignment="Stretch" SelectedIndex="0">
-                            <ComboBoxItem Content="ReadWrite" />
-                            <ComboBoxItem Content="ReadOnly" />
-                        </ComboBox>
+                        <ComboBox Name="MainApplicationIntentComboBox" HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding ApplicationIntentOptions}"
+                                  SelectedItem="{Binding MainApplicationIntent}"
+                                  IsEnabled="{Binding MainApplicationIntentEnabled}" />
 
                         <StackPanel Spacing="4">
                             <Label Content="Encrypt" FontWeight="SemiBold" />
-                            <ComboBox Name="MainEncryptComboBox" SelectedIndex="0" HorizontalAlignment="Stretch">
-                                <ComboBoxItem Content="False" />
-                                <ComboBoxItem Content="True" />
-                                <ComboBoxItem Content="Strict" />
-                            </ComboBox>
+                            <ComboBox Name="MainEncryptComboBox" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding EncryptOptions}"
+                                      SelectedItem="{Binding MainEncryptOption}" />
                         </StackPanel>
 
                         <CheckBox Name="MainTrustServerCertificateCheckBox"
-                                  Content="Trust Server Certificate" />
+                                  Content="Trust Server Certificate"
+                                  IsChecked="{Binding MainTrustServerCertificate}" />
 
                         <StackPanel Spacing="4">
                             <Label Content="Additional Parameters" FontWeight="SemiBold" />
                             <TextBox Name="MainAdditionalParametersTextBox"
                                      AcceptsReturn="True"
                                      Height="60"
-                                     TextWrapping="Wrap" />
+                                     TextWrapping="Wrap"
+                                     Text="{Binding MainAdditionalParameters}" />
                         </StackPanel>
 
                         <Button Name="MainTestConnectionButton"
@@ -111,65 +123,81 @@
                     <StackPanel Spacing="8" MinWidth="250">
                         <CheckBox Name="ShareConnectionSettingsCheckBox"
                                   Content="Share Connection Settings"
-                                  IsChecked="True"
+                                  IsChecked="{Binding ShareDbSettings}"
                                   FontWeight="SemiBold" />
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Server" FontWeight="SemiBold" />
-                            <TextBox Name="ParamServerTextBox" />
+                            <TextBox Name="ParamServerTextBox"
+                                     Text="{Binding ParamServer}" />
                         </StackPanel>
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Authentication" FontWeight="SemiBold" />
-                            <ComboBox Name="ParamAuthenticationComboBox" SelectedIndex="0"
-                                      HorizontalAlignment="Stretch">
-                                <ComboBoxItem Content="Integrated Authentication" />
-                                <ComboBoxItem Content="SQL Server Authentication" />
-                                <ComboBoxItem Content="Azure Active Directory - Universal with MFA" />
+                            <ComboBox Name="ParamAuthenticationComboBox"
+                                      HorizontalAlignment="Stretch"
+                                      SelectedItem="{Binding SelectedParamDbAuthenticationMode}"
+                                      ItemsSource="{Binding AuthenticationModeOptions}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:AuthenticationModeOption">
+                                        <TextBlock
+                                            Text="{Binding Label}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Login" />
-                            <TextBox Name="ParamLoginTextBox" />
+                            <TextBox Name="ParamLoginTextBox"
+                                     Text="{Binding ParamLogin}" />
                         </StackPanel>
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Password" />
-                            <TextBox Name="ParamPasswordTextBox" PasswordChar="●" />
+                            <TextBox Name="ParamPasswordTextBox" PasswordChar="●"
+                                     Text="{Binding ParamPassword}" />
                         </StackPanel>
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Default Database" FontWeight="SemiBold" />
                             <ComboBox Name="ParamDefaultDatabaseComboBox" HorizontalAlignment="Stretch" />
                         </StackPanel>
 
-                        <CheckBox Name="ParamApplicationIntentCheckBox" Content="Application Intent" />
-                        <ComboBox Name="ParamApplicationIntentComboBox" HorizontalAlignment="Stretch" SelectedIndex="0">
-                            <ComboBoxItem Content="ReadWrite" />
-                            <ComboBoxItem Content="ReadOnly" />
-                        </ComboBox>
+                        <CheckBox Name="ParamApplicationIntentCheckBox" Content="Application Intent"
+                                  IsChecked="{Binding ParamApplicationIntentEnabled}"
+                                  IsEnabled="{Binding !ShareDbSettings}" />
+                        <ComboBox Name="ParamApplicationIntentComboBox" HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding ApplicationIntentOptions}"
+                                  SelectedItem="{Binding ParamApplicationIntent}"
+                                  IsEnabled="{Binding ParamApplicationIntentEnabled}" />
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Encrypt" FontWeight="SemiBold" />
-                            <ComboBox Name="ParamEncryptComboBox" HorizontalAlignment="Stretch" />
+                            <ComboBox Name="ParamEncryptComboBox" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding EncryptOptions}"
+                                      SelectedItem="{Binding ParamEncryptOption}" />
                         </StackPanel>
 
                         <CheckBox Name="ParamTrustServerCertificateCheckBox"
-                                  Content="Trust Server Certificate" />
+                                  Content="Trust Server Certificate"
+                                  IsChecked="{Binding ParamTrustServerCertificate}"
+                                  IsEnabled="{Binding !ShareDbSettings}" />
 
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Additional Parameters" FontWeight="SemiBold" />
                             <TextBox Name="ParamAdditionalParametersTextBox"
                                      AcceptsReturn="True"
                                      Height="60"
-                                     TextWrapping="Wrap" />
+                                     TextWrapping="Wrap"
+                                     Text="{Binding ParamAdditionalParameters}" />
                         </StackPanel>
 
                         <Button Name="ParamTestConnectionButton"
                                 Content="Test Connection"
                                 HorizontalAlignment="Right"
-                                Click="ParamTestConnectionButton_OnClick" />
+                                Click="ParamTestConnectionButton_OnClick"
+                                IsEnabled="{Binding !ShareDbSettings}" />
                     </StackPanel>
                 </Border>
             </DockPanel>
