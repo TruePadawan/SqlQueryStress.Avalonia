@@ -33,11 +33,22 @@
                         <StackPanel Spacing="4">
                             <Label Content="Connection Timeout" />
                             <NumericUpDown Name="ConnectionTimeoutUpDown"
-                                           Value="{Binding ConnectionTimeout}"
                                            Minimum="0"
                                            Maximum="3600"
                                            FormatString="0"
-                                           ParsingNumberStyle="Integer" />
+                                           ParsingNumberStyle="Integer">
+                                <NumericUpDown.Value>
+                                    <Binding Path="ConnectionTimeout">
+                                        <Binding.TargetNullValue>
+                                            <x:Int32>15</x:Int32>
+                                        </Binding.TargetNullValue>
+                                        <Binding.FallbackValue>
+                                            <x:Int32>15</x:Int32>
+                                        </Binding.FallbackValue>
+                                    </Binding>
+                                </NumericUpDown.Value>
+
+                            </NumericUpDown>
                         </StackPanel>
 
                         <CheckBox Name="EnableConnectionPoolingCheckBox"
@@ -59,10 +70,20 @@
                         <StackPanel Spacing="4">
                             <Label Content="Command Timeout (0 = Unlimited)" />
                             <NumericUpDown Name="CommandTimeoutUpDown"
-                                           Value="{Binding CommandTimeout}"
                                            Minimum="0"
                                            FormatString="0"
-                                           ParsingNumberStyle="Integer" />
+                                           ParsingNumberStyle="Integer">
+                                <NumericUpDown.Value>
+                                    <Binding Path="CommandTimeout">
+                                        <Binding.TargetNullValue>
+                                            <x:Int32>0</x:Int32>
+                                        </Binding.TargetNullValue>
+                                        <Binding.FallbackValue>
+                                            <x:Int32>0</x:Int32>
+                                        </Binding.FallbackValue>
+                                    </Binding>
+                                </NumericUpDown.Value>
+                            </NumericUpDown>
                         </StackPanel>
 
                         <CheckBox Name="CollectIoStatisticsCheckBox"
