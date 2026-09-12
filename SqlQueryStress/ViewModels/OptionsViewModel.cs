@@ -7,13 +7,13 @@ public partial class OptionsViewModel : ViewModelBase
 {
     private readonly IOptionsService _optionsService;
 
-    [ObservableProperty] private bool _enableConnectionPooling;
-    [ObservableProperty] private bool _collectIOStatistics;
-    [ObservableProperty] private bool _collectTimeStatistics;
-    [ObservableProperty] private bool _forceClientRetrievalOfData;
-    [ObservableProperty] private bool _killQueriesOnCancel;
-    [ObservableProperty] private int _connectionTimeout;
-    [ObservableProperty] private int _commandTimeout;
+    [ObservableProperty] public partial bool EnableConnectionPooling { get; set; }
+    [ObservableProperty] public partial bool CollectIOStatistics { get; set; }
+    [ObservableProperty] public partial bool CollectTimeStatistics { get; set; }
+    [ObservableProperty] public partial bool ForceClientRetrievalOfData { get; set; }
+    [ObservableProperty] public partial bool KillQueriesOnCancel { get; set; }
+    [ObservableProperty] public partial int ConnectionTimeout { get; set; }
+    [ObservableProperty] public partial int CommandTimeout { get; set; }
 
     public OptionsViewModel(IOptionsService optionsService)
     {
