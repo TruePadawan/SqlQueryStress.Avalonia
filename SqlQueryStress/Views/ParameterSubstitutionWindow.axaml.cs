@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
+using Microsoft.Extensions.DependencyInjection;
 using SqlQueryStress.Lib;
 using SqlQueryStress.ViewModels;
 using TextMateSharp.Grammars;
@@ -56,7 +57,7 @@ public partial class ParameterSubstitutionWindow : ModalWindow
     {
         try
         {
-            var databaseSelectWindow = new DatabaseSelectWindow();
+            var databaseSelectWindow = App.ServiceProvider.GetRequiredService<DatabaseSelectWindow>();
             await databaseSelectWindow.ShowDialog(this);
         }
         catch (Exception exception)

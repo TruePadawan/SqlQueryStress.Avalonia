@@ -48,7 +48,7 @@ public partial class MainView : ContentPage
         try
         {
             var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
-            var databaseSelectWindow = new DatabaseSelectWindow();
+            var databaseSelectWindow = App.ServiceProvider.GetRequiredService<DatabaseSelectWindow>();
             await databaseSelectWindow.ShowDialog(mainWindow!);
         }
         catch (Exception exception)
