@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SqlQueryStress.Services.DbConnectionService;
 using SqlQueryStress.Services.OptionsService;
 using SqlQueryStress.Services.ParameterSubstitutionService;
+using SqlQueryStress.Services.QuerySettingsService;
 using SqlQueryStress.ViewModels;
 using SqlQueryStress.Views;
 
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
             collection.AddSingleton<IOptionsService, OptionsService>();
             collection.AddSingleton<IDbConnectionService, DbConnectionService>();
             collection.AddSingleton<IParameterSubstitutionService, ParameterSubstitutionService>();
+            collection.AddSingleton<IQuerySettingsService, QuerySettingsService>();
         }
 
         public void RegisterViewModels()
