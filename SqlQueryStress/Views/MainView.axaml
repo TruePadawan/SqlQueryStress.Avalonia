@@ -129,7 +129,7 @@
                             <StackPanel Spacing="4">
                                 <Label Content="Number of Iterations" Target="IterationCountTextBox" />
                                 <NumericUpDown Name="IterationCountTextBox"
-                                               Value="1"
+                                               Value="{Binding NumIterations}"
                                                Minimum="0"
                                                FormatString="0"
                                                ParsingNumberStyle="Integer" />
@@ -137,7 +137,7 @@
                             <StackPanel Spacing="4">
                                 <Label Content="Number of Threads" Target="ThreadsCountTextBox" />
                                 <NumericUpDown Name="ThreadsCountTextBox"
-                                               Value="1"
+                                               Value="{Binding NumThreads}"
                                                Minimum="0"
                                                FormatString="0"
                                                ParsingNumberStyle="Integer" />
@@ -145,7 +145,7 @@
                             <StackPanel Spacing="4">
                                 <Label Content="Delay between queries (ms)" Target="QueryDelayTextBox" />
                                 <NumericUpDown Name="QueryDelayTextBox"
-                                               Value="0"
+                                               Value="{Binding DelayBetweenQueries}"
                                                Minimum="0"
                                                FormatString="0"
                                                ParsingNumberStyle="Integer" />
@@ -169,7 +169,7 @@
                     Margin="8, 8, 4, 8"
                     CornerRadius="{DynamicResource PanelCornerRadius}">
                 <avaloniaEdit:TextEditor Name="Editor"
-                                         Text="SELECT"
+                                         Document="{Binding MainQueryDocument}"
                                          ShowLineNumbers="True"
                                          FontSize="16"
                                          FontFamily="Fira Code,Cascadia Code,Consolas,Menlo,Monospace" />
