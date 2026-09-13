@@ -34,6 +34,7 @@
                         BorderThickness="1"
                         Height="150">
                     <avaloniaEdit:TextEditor Name="ParameterQueryEditor"
+                                             Document="{Binding ParameterQueryDocument}"
                                              ShowLineNumbers="True"
                                              FontSize="14"
                                              FontFamily="Fira Code,Cascadia Code,Consolas,Menlo,Monospace" />
@@ -49,7 +50,7 @@
             <!-- Parameter Mappings -->
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="Parameter Mappings" FontWeight="SemiBold" Margin="0,0,0,4" />
-                <TableView ItemsSource="{Binding ParameterMappings}" CanUserResizeColumns="False">
+                <TableView ItemsSource="{Binding ParameterSelections}" CanUserResizeColumns="False">
                     <TableView.Columns>
                         <TableViewColumn Header="Parameter" Binding="{Binding Parameter}" Width="*" />
                         <TableViewColumn Header="Datatype" Binding="{Binding Datatype}" Width="*" />

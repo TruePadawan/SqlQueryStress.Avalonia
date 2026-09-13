@@ -84,16 +84,7 @@ public partial class MainView : ContentPage
         try
         {
             var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
-            // TODO: Replace sample data with actual parameter data from the stress test engine
-            var parameterMappings = new ObservableCollection<ParameterMapping>
-            {
-                new("@id", "", ["hermes"]),
-            };
-            var parameterSubstitutionWindow = new ParameterSubstitutionWindow
-            {
-                DataContext = new ParameterSubstitutionViewModel(
-                    "SELECT object_id FROM sys.objects", parameterMappings),
-            };
+            var parameterSubstitutionWindow = App.ServiceProvider.GetRequiredService<ParameterSubstitutionWindow>();
             await parameterSubstitutionWindow.ShowDialog(mainWindow!);
         }
         catch (Exception exception)

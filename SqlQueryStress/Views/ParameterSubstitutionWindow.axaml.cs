@@ -12,9 +12,13 @@ namespace SqlQueryStress.Views;
 
 public partial class ParameterSubstitutionWindow : ModalWindow
 {
-    public ParameterSubstitutionWindow()
+    private readonly ParameterSubstitutionViewModel _viewModel;
+
+    public ParameterSubstitutionWindow(ParameterSubstitutionViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = viewModel;
+        _viewModel = viewModel;
 
         // Configure syntax highlighting for SQL
         var editor = this.FindControl<TextEditor>("ParameterQueryEditor");
@@ -27,19 +31,11 @@ public partial class ParameterSubstitutionWindow : ModalWindow
 
             textMateInstallation.SetGrammar(scopeName);
         }
-
-        // Set editor text from ViewModel once DataContext is available
-        DataContextChanged += (_, _) =>
-        {
-            if (DataContext is ParameterSubstitutionViewModel vm && editor != null)
-            {
-                editor.Text = vm.ParameterQuery;
-            }
-        };
     }
 
     private void OkButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        _viewModel.SaveParameters();
         Close();
     }
 
