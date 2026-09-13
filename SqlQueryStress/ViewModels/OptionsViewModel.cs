@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SqlQueryStress.Services.OptionsService;
 
@@ -12,8 +13,16 @@ public partial class OptionsViewModel : ViewModelBase
     [ObservableProperty] public partial bool CollectTimeStatistics { get; set; }
     [ObservableProperty] public partial bool ForceClientRetrievalOfData { get; set; }
     [ObservableProperty] public partial bool KillQueriesOnCancel { get; set; }
-    [ObservableProperty] public partial int ConnectionTimeout { get; set; }
-    [ObservableProperty] public partial int CommandTimeout { get; set; }
+
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, 3600, ErrorMessage = "Connection timeout must be between 0 and 3600 seconds")]
+    public partial int ConnectionTimeout { get; set; }
+
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(0, int.MaxValue, ErrorMessage = "Command timeout cannot be negative")]
+    public partial int CommandTimeout { get; set; }
 
     public OptionsViewModel(IOptionsService optionsService)
     {

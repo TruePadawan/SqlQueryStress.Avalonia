@@ -129,26 +129,58 @@
                             <StackPanel Spacing="4">
                                 <Label Content="Number of Iterations" Target="IterationCountTextBox" />
                                 <NumericUpDown Name="IterationCountTextBox"
-                                               Value="{Binding NumIterations}"
-                                               Minimum="0"
+                                               Minimum="1"
                                                FormatString="0"
-                                               ParsingNumberStyle="Integer" />
+                                               ParsingNumberStyle="Integer">
+                                    <NumericUpDown.Value>
+                                        <Binding Path="NumIterations">
+                                            <Binding.TargetNullValue>
+                                                <x:Int32>1</x:Int32>
+                                            </Binding.TargetNullValue>
+                                            <Binding.FallbackValue>
+                                                <x:Int32>1</x:Int32>
+                                            </Binding.FallbackValue>
+                                        </Binding>
+                                    </NumericUpDown.Value>
+                                </NumericUpDown>
                             </StackPanel>
                             <StackPanel Spacing="4">
                                 <Label Content="Number of Threads" Target="ThreadsCountTextBox" />
                                 <NumericUpDown Name="ThreadsCountTextBox"
-                                               Value="{Binding NumThreads}"
-                                               Minimum="0"
+                                               Minimum="1"
                                                FormatString="0"
-                                               ParsingNumberStyle="Integer" />
+                                               ParsingNumberStyle="Integer">
+                                    <NumericUpDown.Value>
+                                        <Binding Path="NumThreads">
+                                            <Binding.TargetNullValue>
+                                                <x:Int32>1</x:Int32>
+                                            </Binding.TargetNullValue>
+                                            <Binding.FallbackValue>
+                                                <x:Int32>1</x:Int32>
+                                            </Binding.FallbackValue>
+                                        </Binding>
+                                    </NumericUpDown.Value>
+
+                                </NumericUpDown>
                             </StackPanel>
                             <StackPanel Spacing="4">
                                 <Label Content="Delay between queries (ms)" Target="QueryDelayTextBox" />
                                 <NumericUpDown Name="QueryDelayTextBox"
-                                               Value="{Binding DelayBetweenQueries}"
                                                Minimum="0"
                                                FormatString="0"
-                                               ParsingNumberStyle="Integer" />
+                                               ParsingNumberStyle="Integer">
+                                    <NumericUpDown.Value>
+                                        <Binding Path="DelayBetweenQueries">
+                                            <Binding.TargetNullValue>
+                                                <x:Int32>0</x:Int32>
+                                            </Binding.TargetNullValue>
+                                            <Binding.FallbackValue>
+                                                <x:Int32>0</x:Int32>
+                                            </Binding.FallbackValue>
+                                        </Binding>
+                                    </NumericUpDown.Value>
+
+                                </NumericUpDown>
                             </StackPanel>
                         </StackPanel>
 
