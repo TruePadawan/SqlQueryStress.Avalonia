@@ -7,8 +7,20 @@ namespace SqlQueryStress.Services.DbConnectionService;
 /// </summary>
 public class DbConnectionService : IDbConnectionService
 {
-    public DbConnectionInfo? MainDbConnectionInfo { get; private set; }
-    public DbConnectionInfo? ParamDbConnectionInfo { get; private set; }
+    public DbConnectionInfo MainDbConnectionInfo { get; private set; } = new()
+    {
+        Server = "(local)",
+        Authentication = AuthenticationMode.Integrated,
+        Database = ""
+    };
+
+    public DbConnectionInfo ParamDbConnectionInfo { get; private set; } = new()
+    {
+        Server = "(local)",
+        Authentication = AuthenticationMode.Integrated,
+        Database = ""
+    };
+
     public bool ShareDbSettings { get; set; }
 
     public void UpdateMainDbConnectionInfo(DbConnectionInfo dbConnectionInfo)

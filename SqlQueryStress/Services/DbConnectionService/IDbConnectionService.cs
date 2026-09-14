@@ -4,8 +4,8 @@ namespace SqlQueryStress.Services.DbConnectionService;
 
 public interface IDbConnectionService
 {
-    DbConnectionInfo? MainDbConnectionInfo { get; }
-    DbConnectionInfo? ParamDbConnectionInfo { get; }
+    DbConnectionInfo MainDbConnectionInfo { get; }
+    DbConnectionInfo ParamDbConnectionInfo { get; }
 
     /// <summary>
     /// Whether the Parameterization database connection should be the same as the Main database connection

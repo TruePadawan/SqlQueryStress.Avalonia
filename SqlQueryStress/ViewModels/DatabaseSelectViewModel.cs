@@ -52,12 +52,7 @@ public partial class DatabaseSelectViewModel : ViewModelBase
         ];
 
         // Initialize Main fields from service or defaults
-        var mainInfo = _dbConnectionService.MainDbConnectionInfo ?? new DbConnectionInfo
-        {
-            Server = "(local)",
-            Authentication = AuthenticationMode.Integrated,
-            Database = ""
-        };
+        var mainInfo = _dbConnectionService.MainDbConnectionInfo;
         MainServer = mainInfo.Server;
         SelectedMainDbAuthenticationMode = AuthenticationModeOption.From(mainInfo.Authentication);
         MainLogin = mainInfo.Login;
@@ -69,12 +64,7 @@ public partial class DatabaseSelectViewModel : ViewModelBase
         MainAdditionalParameters = mainInfo.AdditionalParameters;
 
         // Initialize Param fields from service or defaults
-        var paramInfo = _dbConnectionService.ParamDbConnectionInfo ?? new DbConnectionInfo
-        {
-            Server = "(local)",
-            Authentication = AuthenticationMode.Integrated,
-            Database = ""
-        };
+        var paramInfo = _dbConnectionService.ParamDbConnectionInfo;
         ParamServer = paramInfo.Server;
         SelectedParamDbAuthenticationMode = AuthenticationModeOption.From(paramInfo.Authentication);
         ParamLogin = paramInfo.Login;
