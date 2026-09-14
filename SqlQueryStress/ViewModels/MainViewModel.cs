@@ -57,4 +57,19 @@ public partial class MainViewModel : ViewModelBase
     {
         if (!HasErrors) _querySettingsService.DelayBetweenQueries = value;
     }
+
+    /// <summary>
+    /// Refreshes all properties from the query settings service (e.g. after loading settings).
+    /// </summary>
+    public void RefreshFromService()
+    {
+        NumIterations = _querySettingsService.NumIterations;
+        NumThreads = _querySettingsService.NumThreads;
+        DelayBetweenQueries = _querySettingsService.DelayBetweenQueries;
+
+        if (MainQueryDocument.Text != _querySettingsService.MainQuery)
+        {
+            MainQueryDocument.Text = _querySettingsService.MainQuery;
+        }
+    }
 }
