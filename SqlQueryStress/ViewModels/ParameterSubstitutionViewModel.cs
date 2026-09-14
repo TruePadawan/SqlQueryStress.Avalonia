@@ -26,8 +26,25 @@ public partial class ParameterSubstitutionViewModel : ViewModelBase
     public void SaveParameters()
     {
         _parameterService.ParameterQuery = ParameterQueryDocument.Text;
-        // TODO: Save the parameter mappings. I need to figure out how to get the selected columns from the UI
+
+        var mappings = new Dictionary<string, ParameterMappingEntry>();
+        foreach (var item in ParameterSelections)
+        {
+            if (!string.IsNullOrEmpty(item.Parameter))
+            {
+                mappings[item.Parameter] = new ParameterMappingEntry(item.Datatype, item.SelectedColumn);
+            }
+        }
+
+        _parameterService.ParameterMappings = mappings;
     }
 }
 
-public record ParameterSelection(string Parameter, string Datatype, List<string> Columns);
+public partial class ParameterSelection : ObservableObject
+{
+    public required string Parameter { get; set; }
+    public string Datatype { get; set; } = "";
+    public List<string> Columns { get; set; } = [];
+
+    [ObservableProperty] public partial string SelectedColumn { get; set; } = "";
+}

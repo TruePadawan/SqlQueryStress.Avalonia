@@ -57,7 +57,9 @@
                         <TableViewColumn Header="Column" Width="*">
                             <TableViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding Columns}" SelectedIndex="0">
+                                    <ComboBox
+                                        ItemsSource="{Binding Columns}"
+                                        SelectedItem="{Binding SelectedColumn}">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding}" />
