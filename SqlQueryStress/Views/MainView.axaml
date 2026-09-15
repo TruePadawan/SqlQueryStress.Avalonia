@@ -18,14 +18,14 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Name="OptionsMenuItem" Header="_Options" Click="OptionsMenuItem_OnClick" />
-                <MenuItem Header="_Save Settings" Click="SaveSettingsMenuItem_OnClick" />
-                <MenuItem Header="_Load Settings" Click="LoadSettingsMenuItem_OnClick" />
+                <MenuItem Header="_Save Settings" Command="{Binding SaveSettingsCommand}" />
+                <MenuItem Header="_Load Settings" Command="{Binding LoadSettingsCommand}" />
                 <MenuItem Header="Save Benchmark">
                     <MenuItem Header="To CSV" />
                     <MenuItem Header="To Text" />
                     <MenuItem Header="To Clipboard" />
                 </MenuItem>
-                <MenuItem Header="_Exit" />
+                <MenuItem Header="_Exit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About"></MenuItem>

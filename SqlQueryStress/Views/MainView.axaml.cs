@@ -4,9 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
-using Avalonia.Platform.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using SqlQueryStress.Services.SettingsFileService;
 using SqlQueryStress.ViewModels;
 using TextMateSharp.Grammars;
 
@@ -29,6 +27,14 @@ public partial class MainView : ContentPage
 
             textMateInstallation.SetGrammar(scopeName);
         }
+
+        Loaded += (_, _) =>
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.StorageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
+            }
+        };
     }
 
     private async void OptionsMenuItem_OnClick(object? sender, RoutedEventArgs e)
@@ -92,70 +98,6 @@ public partial class MainView : ContentPage
         catch (Exception exception)
         {
             Console.WriteLine($"Could not open Parameter Substitution window, {exception.Message}");
-        }
-    }
-
-    private async void SaveSettingsMenuItem_OnClick(object? sender, RoutedEventArgs e)
-    {
-        try
-        {
-            var topLevel = TopLevel.GetTopLevel(this);
-            if (topLevel?.StorageProvider == null) return;
-
-            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = "Save Settings File",
-                DefaultExtension = "json",
-                SuggestedFileName = "SqlQueryStressSettings.json",
-                FileTypeChoices =
-                [
-                    new FilePickerFileType("JSON Files") { Patterns = ["*.json"] },
-                    new FilePickerFileType("All Files") { Patterns = ["*"] }
-                ]
-            });
-
-            if (file == null) return;
-            var settingsFileService = App.ServiceProvider.GetRequiredService<ISettingsFileService>();
-            await using var stream = await file.OpenWriteAsync();
-            await settingsFileService.SaveAsync(stream);
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine($"Could not save settings, {exception.Message}");
-        }
-    }
-
-    private async void LoadSettingsMenuItem_OnClick(object? sender, RoutedEventArgs e)
-    {
-        try
-        {
-            var topLevel = TopLevel.GetTopLevel(this);
-            if (topLevel?.StorageProvider == null) return;
-
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-            {
-                Title = "Load Settings File",
-                AllowMultiple = false,
-                FileTypeFilter =
-                [
-                    new FilePickerFileType("JSON Files") { Patterns = ["*.json"] },
-                    new FilePickerFileType("All Files") { Patterns = ["*"] }
-                ]
-            });
-
-            if (files.Count <= 0) return;
-            var settingsFileService = App.ServiceProvider.GetRequiredService<ISettingsFileService>();
-            await using var stream = await files[0].OpenReadAsync();
-            await settingsFileService.LoadAsync(stream);
-
-            if (DataContext is MainViewModel mainViewModel)
-            {
-                mainViewModel.RefreshFromService();
-            }
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine($"Could not load settings, {exception.Message}");
         }
     }
 }
