@@ -107,19 +107,17 @@ public partial class MainView : ContentPage
                 Title = "Save Settings File",
                 DefaultExtension = "json",
                 SuggestedFileName = "SqlQueryStressSettings.json",
-                FileTypeChoices = new[]
-                {
-                    new FilePickerFileType("JSON Files") { Patterns = new[] { "*.json" } },
-                    new FilePickerFileType("All Files") { Patterns = new[] { "*" } }
-                }
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("JSON Files") { Patterns = ["*.json"] },
+                    new FilePickerFileType("All Files") { Patterns = ["*"] }
+                ]
             });
 
-            if (file != null)
-            {
-                var settingsFileService = App.ServiceProvider.GetRequiredService<ISettingsFileService>();
-                await using var stream = await file.OpenWriteAsync();
-                await settingsFileService.SaveAsync(stream);
-            }
+            if (file == null) return;
+            var settingsFileService = App.ServiceProvider.GetRequiredService<ISettingsFileService>();
+            await using var stream = await file.OpenWriteAsync();
+            await settingsFileService.SaveAsync(stream);
         }
         catch (Exception exception)
         {
@@ -138,23 +136,21 @@ public partial class MainView : ContentPage
             {
                 Title = "Load Settings File",
                 AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
-                    new FilePickerFileType("JSON Files") { Patterns = new[] { "*.json" } },
-                    new FilePickerFileType("All Files") { Patterns = new[] { "*" } }
-                }
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("JSON Files") { Patterns = ["*.json"] },
+                    new FilePickerFileType("All Files") { Patterns = ["*"] }
+                ]
             });
 
-            if (files.Count > 0)
-            {
-                var settingsFileService = App.ServiceProvider.GetRequiredService<ISettingsFileService>();
-                await using var stream = await files[0].OpenReadAsync();
-                await settingsFileService.LoadAsync(stream);
+            if (files.Count <= 0) return;
+            var settingsFileService = App.ServiceProvider.GetRequiredService<ISettingsFileService>();
+            await using var stream = await files[0].OpenReadAsync();
+            await settingsFileService.LoadAsync(stream);
 
-                if (DataContext is MainViewModel mainViewModel)
-                {
-                    mainViewModel.RefreshFromService();
-                }
+            if (DataContext is MainViewModel mainViewModel)
+            {
+                mainViewModel.RefreshFromService();
             }
         }
         catch (Exception exception)
