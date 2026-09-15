@@ -13,8 +13,8 @@ public record DbConnectionInfo
     public string Password { get; init; } = "";
     public required string Database { get; init; }
     public ApplicationIntent ApplicationIntent { get; init; } = ApplicationIntent.ReadWrite;
-    public EncryptOption EncryptOption { get; init; } = EncryptOption.False;
-    public bool TrustServerCertificate { get; init; } = false;
+    public EncryptOption EncryptOption { get; init; } = EncryptOption.Optional;
+    public bool TrustServerCertificate { get; init; }
     public string AdditionalParameters { get; init; } = "";
     public bool EnablePooling { get; init; } = true;
     public int MaxPoolSize { get; init; } = 2;
@@ -50,6 +50,7 @@ public enum ApplicationIntent
 
 public enum EncryptOption
 {
+    Optional,
     False,
     True,
     Strict
