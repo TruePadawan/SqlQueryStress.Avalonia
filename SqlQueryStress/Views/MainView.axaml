@@ -28,7 +28,7 @@
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="About"></MenuItem>
+                <MenuItem Header="About" />
             </MenuItem>
         </Menu>
 
