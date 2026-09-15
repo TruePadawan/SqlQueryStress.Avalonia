@@ -51,6 +51,13 @@ public partial class DatabaseSelectViewModel : ViewModelBase
             .. Enum.GetValues<AuthenticationMode>().Select(AuthenticationModeOption.From)
         ];
 
+        // Integrated auth is not supported on non-Windows platforms
+        if (!OperatingSystem.IsWindows())
+        {
+            AuthenticationModeOptions =
+                [.. AuthenticationModeOptions.Where(option => option.Mode != AuthenticationMode.Integrated)];
+        }
+
         // Initialize Main fields from service or defaults
         var mainInfo = _dbConnectionService.MainDbConnectionInfo;
         MainServer = mainInfo.Server;

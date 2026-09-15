@@ -10,14 +10,14 @@ public class DbConnectionService : IDbConnectionService
     public DbConnectionInfo MainDbConnectionInfo { get; private set; } = new()
     {
         Server = "(local)",
-        Authentication = AuthenticationMode.Integrated,
+        Authentication = AuthenticationMode.SqlServer,
         Database = ""
     };
 
     public DbConnectionInfo ParamDbConnectionInfo { get; private set; } = new()
     {
         Server = "(local)",
-        Authentication = AuthenticationMode.Integrated,
+        Authentication = AuthenticationMode.SqlServer,
         Database = ""
     };
 
