@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using SqlQueryStress.Models;
 
 namespace SqlQueryStress.Services.DbConnectionService;
@@ -14,4 +15,6 @@ public interface IDbConnectionService
 
     void UpdateMainDbConnectionInfo(DbConnectionInfo dbConnectionInfo);
     void UpdateParamDbConnectionInfo(DbConnectionInfo dbConnectionInfo);
+
+    Task<bool> TestConnectionAsync(DbConnectionInfo dbConnectionInfo, int connectionTimeout);
 }
