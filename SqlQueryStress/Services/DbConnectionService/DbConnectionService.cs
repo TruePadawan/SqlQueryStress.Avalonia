@@ -47,6 +47,9 @@ public class DbConnectionService : IDbConnectionService
         int connectionTimeout
     )
     {
+        if (!HasValidConnectionDetails(dbConnectionInfo))
+            return false;
+        
         var hasServer = !string.IsNullOrEmpty(dbConnectionInfo.Server);
         var usesSqlServerAuthentication = dbConnectionInfo.Authentication == AuthenticationMode.SqlServer;
         var hasSqlServerCredentials = !string.IsNullOrEmpty(dbConnectionInfo.Login) &&
@@ -85,6 +88,9 @@ public class DbConnectionService : IDbConnectionService
         var hasDatabase = !string.IsNullOrEmpty(dbConnectionInfo.Database);
         try
         {
+            if (!HasValidConnectionDetails(dbConnectionInfo))
+                return [];
+
             var connectionString = ConnectionStringBuilder.Build(dbConnectionInfo, connectionTimeout);
 
             await using var connection = new SqlConnection(connectionString);
@@ -119,5 +125,24 @@ public class DbConnectionService : IDbConnectionService
 
             return await GetDatabaseListAsync(serverOnlyConnection, connectionTimeout);
         }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Failed to load database list: {e}");
+            return [];
+        }
+    }
+
+    private static bool HasValidConnectionDetails(DbConnectionInfo info)
+    {
+        if (string.IsNullOrEmpty(info.Server))
+            return false;
+        
+        var usesSqlServerAuthentication = info.Authentication == AuthenticationMode.SqlServer;
+        var eitherCredentialIsEmpty = string.IsNullOrEmpty(info.Password) || string.IsNullOrEmpty(info.Login);
+
+        if (usesSqlServerAuthentication && eitherCredentialIsEmpty)
+            return false;
+
+        return true;
     }
 }
