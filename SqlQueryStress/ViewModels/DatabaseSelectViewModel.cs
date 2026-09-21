@@ -1,50 +1,26 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SqlQueryStress.Models;
 using SqlQueryStress.Services.DbConnectionService;
+using SqlQueryStress.Services.OptionsService;
 
 namespace SqlQueryStress.ViewModels;
 
 public partial class DatabaseSelectViewModel : ViewModelBase
 {
     private readonly IDbConnectionService _dbConnectionService;
+    private readonly IOptionsService _optionsService;
 
-    // Option arrays for combo boxes
-    public AuthenticationModeOption[] AuthenticationModeOptions { get; }
-    public ApplicationIntent[] ApplicationIntentOptions { get; } = Enum.GetValues<ApplicationIntent>();
-    public EncryptOption[] EncryptOptions { get; } = Enum.GetValues<EncryptOption>();
-
-    [ObservableProperty] public partial bool ShareDbSettings { get; set; }
-
-    // Main section observable properties
-    [ObservableProperty] public partial string MainServer { get; set; }
-    [ObservableProperty] public partial AuthenticationModeOption SelectedMainDbAuthenticationMode { get; set; }
-    [ObservableProperty] public partial string MainLogin { get; set; }
-    [ObservableProperty] public partial string MainPassword { get; set; }
-    [ObservableProperty] public partial string MainDatabase { get; set; }
-    [ObservableProperty] public partial bool MainApplicationIntentEnabled { get; set; }
-    [ObservableProperty] public partial ApplicationIntent MainApplicationIntent { get; set; }
-    [ObservableProperty] public partial EncryptOption MainEncryptOption { get; set; }
-    [ObservableProperty] public partial bool MainTrustServerCertificate { get; set; }
-    [ObservableProperty] public partial string MainAdditionalParameters { get; set; }
-
-    // Param section observable properties
-    [ObservableProperty] public partial string ParamServer { get; set; }
-    [ObservableProperty] public partial AuthenticationModeOption SelectedParamDbAuthenticationMode { get; set; }
-    [ObservableProperty] public partial string ParamLogin { get; set; }
-    [ObservableProperty] public partial string ParamPassword { get; set; }
-    [ObservableProperty] public partial string ParamDatabase { get; set; }
-    [ObservableProperty] public partial bool ParamApplicationIntentEnabled { get; set; }
-    [ObservableProperty] public partial ApplicationIntent ParamApplicationIntent { get; set; }
-    [ObservableProperty] public partial EncryptOption ParamEncryptOption { get; set; }
-    [ObservableProperty] public partial bool ParamTrustServerCertificate { get; set; }
-    [ObservableProperty] public partial string ParamAdditionalParameters { get; set; }
-
-    public DatabaseSelectViewModel(IDbConnectionService dbConnectionService)
+    public DatabaseSelectViewModel(
+        IDbConnectionService dbConnectionService,
+        IOptionsService optionsService
+    )
     {
         _dbConnectionService = dbConnectionService;
-
+        _optionsService = optionsService;
         // Build authentication mode options
         AuthenticationModeOptions =
         [
@@ -85,13 +61,98 @@ public partial class DatabaseSelectViewModel : ViewModelBase
         ShareDbSettings = _dbConnectionService.ShareDbSettings;
     }
 
+    // DB collections
+    [ObservableProperty] public partial IReadOnlyList<string> MainDatabases { get; set; } = [];
+    [ObservableProperty] public partial IReadOnlyList<string> ParamDatabases { get; set; } = [];
+
+    // Option arrays for combo boxes
+    public AuthenticationModeOption[] AuthenticationModeOptions { get; }
+    public ApplicationIntent[] ApplicationIntentOptions { get; } = Enum.GetValues<ApplicationIntent>();
+    public EncryptOption[] EncryptOptions { get; } = Enum.GetValues<EncryptOption>();
+
+    [ObservableProperty] public partial bool ShareDbSettings { get; set; }
+
+    // Main section observable properties
+    [ObservableProperty] public partial string MainServer { get; set; }
+    [ObservableProperty] public partial AuthenticationModeOption SelectedMainDbAuthenticationMode { get; set; }
+    [ObservableProperty] public partial string MainLogin { get; set; }
+    [ObservableProperty] public partial string MainPassword { get; set; }
+    [ObservableProperty] public partial string MainDatabase { get; set; }
+    [ObservableProperty] public partial bool MainApplicationIntentEnabled { get; set; }
+    [ObservableProperty] public partial ApplicationIntent MainApplicationIntent { get; set; }
+    [ObservableProperty] public partial EncryptOption MainEncryptOption { get; set; }
+    [ObservableProperty] public partial bool MainTrustServerCertificate { get; set; }
+    [ObservableProperty] public partial string MainAdditionalParameters { get; set; }
+
+    // Param section observable properties
+    [ObservableProperty] public partial string ParamServer { get; set; }
+    [ObservableProperty] public partial AuthenticationModeOption SelectedParamDbAuthenticationMode { get; set; }
+    [ObservableProperty] public partial string ParamLogin { get; set; }
+    [ObservableProperty] public partial string ParamPassword { get; set; }
+    [ObservableProperty] public partial string ParamDatabase { get; set; }
+    [ObservableProperty] public partial bool ParamApplicationIntentEnabled { get; set; }
+    [ObservableProperty] public partial ApplicationIntent ParamApplicationIntent { get; set; }
+    [ObservableProperty] public partial EncryptOption ParamEncryptOption { get; set; }
+    [ObservableProperty] public partial bool ParamTrustServerCertificate { get; set; }
+    [ObservableProperty] public partial string ParamAdditionalParameters { get; set; }
+
     /// <summary>
     /// Reconstructs DbConnectionInfo records from the observable properties and
     /// persists them to the connection service.
     /// </summary>
     public void ApplyChanges()
     {
-        var mainDbConnectionInfo = new DbConnectionInfo
+        var mainDbConnectionInfo = BuildMainConnectionInfo();
+        _dbConnectionService.UpdateMainDbConnectionInfo(mainDbConnectionInfo);
+
+        if (ShareDbSettings)
+        {
+            _dbConnectionService.UpdateParamDbConnectionInfo(mainDbConnectionInfo);
+        }
+        else
+        {
+            var paramDbConnectionInfo = BuildParamDbConnectionInfo();
+            _dbConnectionService.UpdateParamDbConnectionInfo(paramDbConnectionInfo);
+        }
+
+        _dbConnectionService.ShareDbSettings = ShareDbSettings;
+    }
+
+    public Task<bool> TestMainConnectionAsync()
+    {
+        return _dbConnectionService.TestConnectionAsync(
+            BuildMainConnectionInfo(),
+            _optionsService.ConnectionTimeout
+        );
+    }
+
+    public Task<bool> TestParamDatabasesAsync()
+    {
+        return _dbConnectionService.TestConnectionAsync(
+            BuildParamDbConnectionInfo(),
+            _optionsService.ConnectionTimeout
+        );
+    }
+
+    public async Task LoadMainDatabasesAsync()
+    {
+        MainDatabases = await _dbConnectionService.GetDatabaseListAsync(
+            BuildMainConnectionInfo(),
+            _optionsService.ConnectionTimeout
+        );
+    }
+
+    public async Task LoadParamDatabasesAsync()
+    {
+        ParamDatabases = await _dbConnectionService.GetDatabaseListAsync(
+            BuildParamDbConnectionInfo(),
+            _optionsService.ConnectionTimeout
+        );
+    }
+
+    private DbConnectionInfo BuildMainConnectionInfo()
+    {
+        return new DbConnectionInfo
         {
             Server = MainServer,
             Authentication = SelectedMainDbAuthenticationMode.Mode,
@@ -103,29 +164,21 @@ public partial class DatabaseSelectViewModel : ViewModelBase
             TrustServerCertificate = MainTrustServerCertificate,
             AdditionalParameters = MainAdditionalParameters
         };
-        _dbConnectionService.UpdateMainDbConnectionInfo(mainDbConnectionInfo);
+    }
 
-        if (ShareDbSettings)
+    private DbConnectionInfo BuildParamDbConnectionInfo()
+    {
+        return new DbConnectionInfo
         {
-            _dbConnectionService.UpdateParamDbConnectionInfo(mainDbConnectionInfo);
-        }
-        else
-        {
-            var paramDbConnectionInfo = new DbConnectionInfo
-            {
-                Server = ParamServer,
-                Authentication = SelectedParamDbAuthenticationMode.Mode,
-                Login = ParamLogin,
-                Password = ParamPassword,
-                Database = ParamDatabase,
-                ApplicationIntent = ParamApplicationIntent,
-                EncryptOption = ParamEncryptOption,
-                TrustServerCertificate = ParamTrustServerCertificate,
-                AdditionalParameters = ParamAdditionalParameters
-            };
-            _dbConnectionService.UpdateParamDbConnectionInfo(paramDbConnectionInfo);
-        }
-
-        _dbConnectionService.ShareDbSettings = ShareDbSettings;
+            Server = ParamServer,
+            Authentication = SelectedParamDbAuthenticationMode.Mode,
+            Login = ParamLogin,
+            Password = ParamPassword,
+            Database = ParamDatabase,
+            ApplicationIntent = ParamApplicationIntent,
+            EncryptOption = ParamEncryptOption,
+            TrustServerCertificate = ParamTrustServerCertificate,
+            AdditionalParameters = ParamAdditionalParameters
+        };
     }
 }
