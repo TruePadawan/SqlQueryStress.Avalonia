@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SqlQueryStress.Models;
 
@@ -17,4 +18,5 @@ public interface IDbConnectionService
     void UpdateParamDbConnectionInfo(DbConnectionInfo dbConnectionInfo);
 
     Task<bool> TestConnectionAsync(DbConnectionInfo dbConnectionInfo, int connectionTimeout);
+    Task<IReadOnlyList<string>> GetDatabaseListAsync(DbConnectionInfo dbConnectionInfo, int connectionTimeout);
 }
