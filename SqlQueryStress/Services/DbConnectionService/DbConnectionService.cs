@@ -60,7 +60,8 @@ public class DbConnectionService : IDbConnectionService
         var connectionString = ConnectionStringBuilder.Build(dbConnectionInfo, connectionTimeout);
 
         using var connection = new SqlConnection(connectionString);
-
+        ConnectionSettingsHelper.AttachEventHandler(connection);
+        
         try
         {
             await connection.OpenAsync();
@@ -85,6 +86,7 @@ public class DbConnectionService : IDbConnectionService
             var connectionString = ConnectionStringBuilder.Build(dbConnectionInfo, connectionTimeout);
 
             await using var connection = new SqlConnection(connectionString);
+            ConnectionSettingsHelper.AttachEventHandler(connection);
             await connection.OpenAsync();
 
             const string query = """
