@@ -7,6 +7,10 @@ namespace SqlQueryStress.Services.DbConnectionService;
 using SqlApplicationIntent = Microsoft.Data.SqlClient.ApplicationIntent;
 using SqlEncryptOption = Microsoft.Data.SqlClient.SqlConnectionEncryptOption;
 
+/// <summary>
+/// Builds a SQL Server connection string from the supplied database connection settings
+/// returns a SQL Server connection string
+/// </summary>
 public static class ConnectionStringBuilder
 {
     public static string Build(DbConnectionInfo info, int connectionTimeout)

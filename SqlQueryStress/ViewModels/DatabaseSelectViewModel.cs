@@ -118,6 +118,9 @@ public partial class DatabaseSelectViewModel : ViewModelBase
         _dbConnectionService.ShareDbSettings = ShareDbSettings;
     }
 
+    /// <summary>
+    ///  Tests the current main workload connection settings  
+    /// </summary>
     public Task<bool> TestMainConnectionAsync()
     {
         return _dbConnectionService.TestConnectionAsync(
@@ -125,7 +128,10 @@ public partial class DatabaseSelectViewModel : ViewModelBase
             _optionsService.ConnectionTimeout
         );
     }
-
+    
+    /// <summary>
+    /// Tests the current parameterization connection settings
+    /// </summary>
     public Task<bool> TestParamDatabasesAsync()
     {
         return _dbConnectionService.TestConnectionAsync(
@@ -133,7 +139,10 @@ public partial class DatabaseSelectViewModel : ViewModelBase
             _optionsService.ConnectionTimeout
         );
     }
-
+    
+    /// <summary>
+    /// Loads the db list for the main workload connection
+    /// </summary>
     public async Task LoadMainDatabasesAsync()
     {
         MainDatabases = await _dbConnectionService.GetDatabaseListAsync(
@@ -142,6 +151,9 @@ public partial class DatabaseSelectViewModel : ViewModelBase
         );
     }
 
+    /// <summary>
+    /// Loads the db list for the parameterization connection
+    /// </summary>
     public async Task LoadParamDatabasesAsync()
     {
         ParamDatabases = await _dbConnectionService.GetDatabaseListAsync(
@@ -149,7 +161,7 @@ public partial class DatabaseSelectViewModel : ViewModelBase
             _optionsService.ConnectionTimeout
         );
     }
-
+    
     private DbConnectionInfo BuildMainConnectionInfo()
     {
         return new DbConnectionInfo

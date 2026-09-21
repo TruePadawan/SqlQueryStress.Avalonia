@@ -14,7 +14,7 @@ public class DbConnectionService : IDbConnectionService
     private const int AzureFirewallError = 40615;
     private const int LoginFailedError = 18456;
     private const int CannotOpenDatabaseError = 4060;
-    
+
     public DbConnectionInfo MainDbConnectionInfo { get; private set; } = new()
     {
         Server = "(local)",
@@ -40,7 +40,8 @@ public class DbConnectionService : IDbConnectionService
     {
         ParamDbConnectionInfo = dbConnectionInfo;
     }
-
+   
+    /// <inheritdoc/>
     public async Task<bool> TestConnectionAsync(
         DbConnectionInfo dbConnectionInfo,
         int connectionTimeout
@@ -61,7 +62,7 @@ public class DbConnectionService : IDbConnectionService
 
         using var connection = new SqlConnection(connectionString);
         ConnectionSettingsHelper.AttachEventHandler(connection);
-        
+
         try
         {
             await connection.OpenAsync();
@@ -73,7 +74,8 @@ public class DbConnectionService : IDbConnectionService
             return false;
         }
     }
-
+    
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<string>> GetDatabaseListAsync(
         DbConnectionInfo dbConnectionInfo,
         int connectionTimeout

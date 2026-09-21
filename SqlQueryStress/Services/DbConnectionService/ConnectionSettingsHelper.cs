@@ -5,8 +5,15 @@ using Microsoft.Data.SqlClient;
 
 namespace SqlQueryStress.Services.DbConnectionService;
 
+/// <summary>
+/// Applies SQL session settings from querySettings.sql whenever a SqlConnection is opened
+/// Falls back to the built-in default settings when the settings file cannot be found beside the application executable
+/// </summary>
 internal static class ConnectionSettingsHelper
 {
+    /// <summary>
+    /// attaches the query settings handler to the supplied SQL connection
+    /// </summary>
     public static void AttachEventHandler(SqlConnection connection)
     {
         connection.StateChange += OnStateChange;
