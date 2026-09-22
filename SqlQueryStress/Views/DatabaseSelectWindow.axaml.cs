@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Interactivity;
 using SqlQueryStress.Lib;
 using SqlQueryStress.ViewModels;
@@ -26,13 +27,32 @@ public partial class DatabaseSelectWindow : ModalWindow
         Close();
     }
 
-    private void MainTestConnectionButton_OnClick(object? sender, RoutedEventArgs e)
+    private async void MainTestConnectionButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        // TODO: Implement test connection for main load settings
+        var success = await _viewModel.TestMainConnectionAsync();
+
+        MainTestConnectionButton.Content = success
+            ? "Connection OK"
+            : "Connection Failed";
     }
 
-    private void ParamTestConnectionButton_OnClick(object? sender, RoutedEventArgs e)
+    private async void ParamTestConnectionButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        // TODO: Implement test connection for parameterization settings
+        var success = await _viewModel.TestParamDatabasesAsync();
+        
+        ParamTestConnectionButton.Content = success
+            ? "Connection OK"
+            : "Connection Failed";
+    }
+
+    private async void MainDefaultDatabaseComboBox_OnDropDownOpened(object? sender, EventArgs e)
+    {
+        if (MainAutoRefreshCheckBox.IsChecked == true)
+            await _viewModel.LoadMainDatabasesAsync();
+    }
+
+    private async void ParamDefaultDatabaseComboBox_OnDropDownOpened(object? sender, EventArgs e)
+    {
+        await _viewModel.LoadParamDatabasesAsync();
     }
 }

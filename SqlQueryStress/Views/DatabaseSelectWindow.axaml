@@ -73,7 +73,11 @@
                                           IsChecked="True" />
                                 <Label Content="Default Database" FontWeight="SemiBold" />
                             </DockPanel>
-                            <ComboBox Name="MainDefaultDatabaseComboBox" HorizontalAlignment="Stretch" />
+                            <ComboBox Name="MainDefaultDatabaseComboBox" 
+                                      HorizontalAlignment="Stretch" 
+                                      ItemsSource="{Binding MainDatabases}"
+                                      SelectedItem="{Binding MainDatabase}"
+                                      DropDownOpened="MainDefaultDatabaseComboBox_OnDropDownOpened"/>
                         </StackPanel>
 
                         <CheckBox Name="MainApplicationIntentCheckBox" Content="Application Intent"
@@ -161,7 +165,11 @@
 
                         <StackPanel Spacing="4" IsEnabled="{Binding !ShareDbSettings}">
                             <Label Content="Default Database" FontWeight="SemiBold" />
-                            <ComboBox Name="ParamDefaultDatabaseComboBox" HorizontalAlignment="Stretch" />
+                            <ComboBox Name="ParamDefaultDatabaseComboBox" 
+                                      HorizontalAlignment="Stretch" 
+                                      ItemsSource="{Binding ParamDatabases}"
+                                      SelectedItem="{Binding ParamDatabase}"
+                                      DropDownOpened="ParamDefaultDatabaseComboBox_OnDropDownOpened"/>
                         </StackPanel>
 
                         <CheckBox Name="ParamApplicationIntentCheckBox" Content="Application Intent"
