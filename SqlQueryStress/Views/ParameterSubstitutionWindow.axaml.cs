@@ -31,6 +31,21 @@ public partial class ParameterSubstitutionWindow : ModalWindow
 
             textMateInstallation.SetGrammar(scopeName);
         }
+
+        Opened += async (_, _) =>
+        {
+            if (string.IsNullOrWhiteSpace(_viewModel.ParameterQueryDocument.Text))
+                return;
+
+            try
+            {
+                await _viewModel.RefreshParameterSelectionAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Could not load parameter selection: {exception.Message}");
+            }
+        };
     }
 
     private void OkButton_OnClick(object? sender, RoutedEventArgs e)
@@ -44,9 +59,16 @@ public partial class ParameterSubstitutionWindow : ModalWindow
         Close();
     }
 
-    private void GetColumnsButton_OnClick(object? sender, RoutedEventArgs e)
+    private async void GetColumnsButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        // TODO: Implement get columns functionality
+        try
+        {
+            await _viewModel.RefreshParameterSelectionAsync();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Could not load parameter columns: {exception.Message}");
+        }
     }
 
     private async void DatabaseButton_OnClick(object? sender, RoutedEventArgs e)
