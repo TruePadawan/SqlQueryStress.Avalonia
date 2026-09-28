@@ -11,7 +11,11 @@ namespace SqlQueryStress.Services.ParameterSubstitutionService;
 
 public class ParameterSubstitutionService : IParameterSubstitutionService
 {
+    /// <summary>
+    /// Matches all occurrences of @ followed by a word character
+    /// </summary>
     private static readonly Regex ParameterRegex = new(@"(?<=[=,\s\(])@\w{1,}(?=[=,\s\)]?)");
+
     public string ParameterQuery { get; set; } = "";
     public Dictionary<string, ParameterMappingEntry> ParameterMappings { get; set; } = [];
 
@@ -21,6 +25,7 @@ public class ParameterSubstitutionService : IParameterSubstitutionService
 
         var parameters = new List<string>();
 
+        // Extract all parameter names from the query
         foreach (Match match in ParameterRegex.Matches(query))
         {
             var parameter = match.Value.ToLowerInvariant();
@@ -37,7 +42,8 @@ public class ParameterSubstitutionService : IParameterSubstitutionService
         string parameterQuery,
         DbConnectionInfo dbConnectionInfo,
         int connectionTimeout
-    ) {
+    )
+    {
         ArgumentNullException.ThrowIfNull(parameterQuery);
         ArgumentNullException.ThrowIfNull(dbConnectionInfo);
 
