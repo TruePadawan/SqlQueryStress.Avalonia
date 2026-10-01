@@ -35,7 +35,7 @@ internal sealed class ParamServer
     // start at -1 so the first increment selects row 0
     private int _currentRow = -1;
 
-    private ParamServer(
+    internal ParamServer(
         SqlParameter[] parameterTemplates,
         object?[][] rows
     )
@@ -57,7 +57,6 @@ internal sealed class ParamServer
 
         // Do not mutate the mappings owned by ParameterSubstitutionService
         // Only mappings with a selected source column participate in a run
-
         var activeMappings = mappings
             .Where(mapping => !string.IsNullOrWhiteSpace(mapping.Value.ColumnName))
             .ToArray();
@@ -71,8 +70,10 @@ internal sealed class ParamServer
         ConnectionSettingsHelper.AttachEventHandler(connection);
 
         await connection.OpenAsync(cancellationToken);
-
-#pragma warning disable CA2100 // parameter queries are user supplied
+        
+// parameter queries are user supplied... it would ideally block since this could be injection
+// executing user-authored SQL is intentional here
+#pragma warning disable CA2100 
         await using var command = new SqlCommand(parameterQuery, connection);
 #pragma warning restore CA2100
 
