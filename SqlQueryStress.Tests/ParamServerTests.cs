@@ -1,8 +1,7 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
+using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
-using Xunit;
 
 namespace SqlQueryStress.Tests;
 
@@ -28,18 +27,18 @@ public class ParamServerTests
         var server = new ParamServer(templates, rows);
         var parameters = server.CreateParameters();
 
-        Assert.Equal(2, parameters.Length);
-
-        Assert.Equal("@id", parameters[0].ParameterName);
-        Assert.Equal(SqlDbType.Int, parameters[0].SqlDbType);
-
-        Assert.Equal("@name", parameters[1].ParameterName);
-        Assert.Equal(SqlDbType.NVarChar, parameters[1].SqlDbType);
-        Assert.Equal(50, parameters[1].Size);
-
+        parameters.Length.Should().Be(2);
+        
+        parameters[0].ParameterName.Should().Be("@id");
+        parameters[0].SqlDbType.Should().Be(SqlDbType.Int);
+        
+        parameters[1].ParameterName.Should().Be("@name");
+        parameters[1].SqlDbType.Should().Be(SqlDbType.NVarChar);
+        parameters[1].Size.Should().Be(50);
+        
         // Each worker should get its own SqlParameter instances
-        Assert.NotSame(templates[0], parameters[0]);
-        Assert.NotSame(templates[1], parameters[1]);
+        parameters[0].Should().NotBeSameAs(templates[0]);
+        parameters[1].Should().NotBeSameAs(templates[1]);
     }
 
     [Fact]
@@ -64,8 +63,8 @@ public class ParamServerTests
 
         server.PopulateNextRow(command.Parameters);
 
-        Assert.Equal(1, command.Parameters["@id"].Value);
-        Assert.Equal("Alice", command.Parameters["@name"].Value);
+        command.Parameters["@id"].Value.Should().Be(1);
+        command.Parameters["@name"].Value.Should().Be("Alice");
     }
 
     [Fact]
@@ -89,17 +88,17 @@ public class ParamServerTests
         command.Parameters.AddRange(server.CreateParameters());
 
         server.PopulateNextRow(command.Parameters);
-        Assert.Equal(10, command.Parameters["@id"].Value);
+        command.Parameters["@id"].Value.Should().Be(10);
+        
+        server.PopulateNextRow(command.Parameters);
+        command.Parameters["@id"].Value.Should().Be(20);
 
         server.PopulateNextRow(command.Parameters);
-        Assert.Equal(20, command.Parameters["@id"].Value);
-
-        server.PopulateNextRow(command.Parameters);
-        Assert.Equal(30, command.Parameters["@id"].Value);
+        command.Parameters["@id"].Value.Should().Be(30);
 
         // once all rows have been used, start again from row 0
         server.PopulateNextRow(command.Parameters);
-        Assert.Equal(10, command.Parameters["@id"].Value);
+        command.Parameters["@id"].Value.Should().Be(10);
     }
 
     [Fact]
@@ -122,10 +121,7 @@ public class ParamServerTests
 
         server.PopulateNextRow(command.Parameters);
 
-        Assert.Equal(
-            DBNull.Value,
-            command.Parameters["@name"].Value
-        );
+        command.Parameters["@name"].Value.Should().Be(DBNull.Value);
     }
 
     [Fact]
@@ -148,8 +144,12 @@ public class ParamServerTests
         command.Parameters.Add(
             new SqlParameter("@id", SqlDbType.Int)
         );
-        
-        Assert.Throws<InvalidOperationException>(
-            () => server.PopulateNextRow(command.Parameters));
+
+        Action action = () => server.PopulateNextRow(command.Parameters);
+
+        action
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage("The parameter collection does not match the configured mappings");
     }
 }
