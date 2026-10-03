@@ -10,6 +10,7 @@ internal sealed class QueryInput : IDisposable
     private readonly SqlCommand _queryCommand;
     private readonly int _iterations;
     private readonly Action<QueryOutput> _publishOutput;
+    private readonly ParamServer? _paramServer;
 
     private readonly Action<SqlConnection> _openConnection;
     private readonly Action<SqlCommand> _executeQuery;
@@ -19,7 +20,8 @@ internal sealed class QueryInput : IDisposable
         SqlConnection connection,
         SqlCommand queryCommand,
         int iterations,
-        Action<QueryOutput> publishOutput)
+        Action<QueryOutput> publishOutput,
+        ParamServer? paramServer = null)
         : this(
             connection,
             queryCommand,
@@ -27,12 +29,11 @@ internal sealed class QueryInput : IDisposable
             publishOutput,
             static connection => connection.Open(),
             static command => command.ExecuteNonQuery(),
-            static connection => connection.Close())
+            static connection => connection.Close(),
+            paramServer)
     {
     }
 
-    // Internal execution hooks keep the worker unit-testable without
-    // requiring a live SQL Server instance.
     internal QueryInput(
         SqlConnection connection,
         SqlCommand queryCommand,
@@ -40,7 +41,8 @@ internal sealed class QueryInput : IDisposable
         Action<QueryOutput> publishOutput,
         Action<SqlConnection> openConnection,
         Action<SqlCommand> executeQuery,
-        Action<SqlConnection> closeConnection)
+        Action<SqlConnection> closeConnection,
+        ParamServer? paramServer)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(queryCommand);
@@ -56,12 +58,27 @@ internal sealed class QueryInput : IDisposable
         _queryCommand = queryCommand;
         _iterations = iterations;
         _publishOutput = publishOutput;
+        _paramServer = paramServer;
 
         _openConnection = openConnection;
         _executeQuery = executeQuery;
         _closeConnection = closeConnection;
 
         _queryCommand.Connection = _connection;
+
+        if (_paramServer is not null)
+        {
+            if (_queryCommand.Parameters.Count > 0)
+            {
+                throw new ArgumentException(
+                    "The query command must not already contain parameters " +
+                    "when a parameter server is supplied.",
+                    nameof(queryCommand));
+            }
+
+            _queryCommand.Parameters.AddRange(
+                _paramServer.CreateParameters());
+        }
     }
 
     internal void Run()
@@ -74,6 +91,12 @@ internal sealed class QueryInput : IDisposable
             try
             {
                 _openConnection(_connection);
+
+                if (_paramServer is not null)
+                {
+                    _paramServer.PopulateNextRow(
+                        _queryCommand.Parameters);
+                }
 
                 stopwatch.Start();
                 _executeQuery(_queryCommand);

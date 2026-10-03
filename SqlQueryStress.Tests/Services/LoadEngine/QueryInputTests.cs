@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Data;
+using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
 
@@ -28,7 +29,8 @@ public class QueryInputTests
                 executionCount++;
                 Thread.Sleep(5);
             },
-            _ => closeCount++
+            _ => closeCount++,
+            paramServer: null
         );
 
         worker.Run();
@@ -71,19 +73,66 @@ public class QueryInputTests
                 if (executionCount == 1)
                     throw expectedException;
             },
-            _ => { }
+            _ => { },
+            paramServer: null
         );
-        
+
         worker.Run();
-        
+
         executionCount.Should().Be(2);
-        
+
         outputs.Should().HaveCount(2);
-        
+
         outputs[0].Error.Should().BeSameAs(expectedException);
         outputs[0].Finished.Should().BeFalse();
 
         outputs[1].Error.Should().BeNull();
+        outputs[1].Finished.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Run_WithParamServer_PopulateNextRowBeforeExecution()
+    {
+        var connection = new SqlConnection();
+        var command = new SqlCommand();
+
+        var parameterTemplates = new[]
+        {
+            new SqlParameter("@id", SqlDbType.Int)
+        };
+
+        var rows = new object?[][]
+        {
+            new object?[] { 101 },
+            new object?[] { 202 }
+        };
+
+        var paramServer = new ParamServer(parameterTemplates, rows);
+
+        var outputs = new List<QueryOutput>();
+        var observedValues = new List<int>();
+
+        using var worker = new QueryInput(
+            connection,
+            command,
+            iterations: 2,
+            outputs.Add,
+            _ => { },
+            queryCommand => { observedValues.Add((int)queryCommand.Parameters["@id"].Value); },
+            _ => { },
+            paramServer
+        );
+
+        command.Parameters.Count.Should().Be(1);
+
+        worker.Run();
+
+        observedValues.Should().Equal(101, 202);
+
+        outputs.Should().HaveCount(2);
+        outputs.Should().OnlyContain(output => output.Error == null);
+
+        outputs[0].Finished.Should().BeFalse();
         outputs[1].Finished.Should().BeTrue();
     }
 }
