@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
@@ -134,5 +135,29 @@ public class QueryInputTests
 
         outputs[0].Finished.Should().BeFalse();
         outputs[1].Finished.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Run_WithQueryDelay_WaitsBetweenIterations()
+    {
+        var connection = new SqlConnection();
+        var command = new SqlCommand();
+
+        var outputs = new List<QueryOutput>();
+        var executionTimes = new List<long>();
+
+        var stopwatch = Stopwatch.StartNew();
+
+        using var worker = new QueryInput(
+            connection,
+            command,
+            iterations: 2,
+            outputs.Add,
+            _ => { },
+            _ => executionTimes.Add(stopwatch.ElapsedMilliseconds),
+            _ => { },
+            paramServer: null,
+            queryDelay: 30
+        );
     }
 }

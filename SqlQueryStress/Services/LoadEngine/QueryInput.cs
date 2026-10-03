@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using Microsoft.Data.SqlClient;
 
 namespace SqlQueryStress.Services.LoadEngine;
@@ -11,6 +12,7 @@ internal sealed class QueryInput : IDisposable
     private readonly int _iterations;
     private readonly Action<QueryOutput> _publishOutput;
     private readonly ParamServer? _paramServer;
+    private readonly int _queryDelay;
 
     private readonly Action<SqlConnection> _openConnection;
     private readonly Action<SqlCommand> _executeQuery;
@@ -21,7 +23,8 @@ internal sealed class QueryInput : IDisposable
         SqlCommand queryCommand,
         int iterations,
         Action<QueryOutput> publishOutput,
-        ParamServer? paramServer = null)
+        ParamServer? paramServer = null,
+        int queryDelay = 0)
         : this(
             connection,
             queryCommand,
@@ -30,7 +33,8 @@ internal sealed class QueryInput : IDisposable
             static connection => connection.Open(),
             static command => command.ExecuteNonQuery(),
             static connection => connection.Close(),
-            paramServer)
+            paramServer,
+            queryDelay)
     {
     }
 
@@ -42,7 +46,8 @@ internal sealed class QueryInput : IDisposable
         Action<SqlConnection> openConnection,
         Action<SqlCommand> executeQuery,
         Action<SqlConnection> closeConnection,
-        ParamServer? paramServer)
+        ParamServer? paramServer,
+        int queryDelay = 0)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(queryCommand);
@@ -54,12 +59,16 @@ internal sealed class QueryInput : IDisposable
         if (iterations < 0)
             throw new ArgumentOutOfRangeException(nameof(iterations));
 
+        if (queryDelay < 0)
+            throw new ArgumentOutOfRangeException(nameof(queryDelay));
+
         _connection = connection;
         _queryCommand = queryCommand;
         _iterations = iterations;
         _publishOutput = publishOutput;
         _paramServer = paramServer;
-
+        _queryDelay = queryDelay;
+        
         _openConnection = openConnection;
         _executeQuery = executeQuery;
         _closeConnection = closeConnection;
@@ -121,6 +130,9 @@ internal sealed class QueryInput : IDisposable
                     Time = stopwatch.Elapsed,
                     Finished = i == _iterations - 1
                 });
+            
+            if(_queryDelay > 0 && i < _iterations - 1)
+                Thread.Sleep(_queryDelay);
         }
     }
 
