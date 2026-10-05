@@ -8,7 +8,7 @@ namespace SqlQueryStress.Services.LoadEngine;
 /// <summary>
 /// Represents a worker that executes an SQL query
 /// </summary>
-internal sealed class QueryExecutionWorker : IDisposable
+internal sealed class QueryWorker : IDisposable
 {
     private readonly SqlConnection _connection;
     private readonly SqlCommand _queryCommand;
@@ -24,7 +24,7 @@ internal sealed class QueryExecutionWorker : IDisposable
     private readonly CancellationToken _cancellationToken;
     private readonly Action<SqlCommand> _cancelQuery;
 
-    internal QueryExecutionWorker(
+    internal QueryWorker(
         SqlConnection connection,
         SqlCommand queryCommand,
         int iterations,
@@ -47,7 +47,7 @@ internal sealed class QueryExecutionWorker : IDisposable
     {
     }
 
-    internal QueryExecutionWorker(
+    internal QueryWorker(
         SqlConnection connection,
         SqlCommand queryCommand,
         int iterations,
