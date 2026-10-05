@@ -2,6 +2,9 @@
 
 namespace SqlQueryStress.Services.LoadEngine;
 
+/// <summary>
+/// Represents the output of a query execution
+/// </summary>
 internal sealed class QueryOutput
 {
     public Exception? Error { get; set; }
