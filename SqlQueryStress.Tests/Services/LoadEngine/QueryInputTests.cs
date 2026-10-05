@@ -160,4 +160,75 @@ public class QueryInputTests
             queryDelay: 30
         );
     }
+
+    [Fact]
+    public void Run_WhenCancelled_StopsFurtherIterationsAndCancelsActiveCommand()
+    {
+        var connection = new SqlConnection();
+        var command = new SqlCommand();
+        using var cancellationSource = new CancellationTokenSource();
+
+        var outputs = new List<QueryOutput>();
+
+        var executionCount = 0;
+        var cancelCount = 0;
+
+        using var worker = new QueryInput(
+            connection,
+            command,
+            iterations: 3,
+            outputs.Add,
+            _ => { },
+            _ =>
+            {
+                executionCount++;
+                cancellationSource.Cancel();
+            },
+            _ => { },
+            paramServer: null,
+            queryDelay: 0,
+            cancellationToken: cancellationSource.Token,
+            cancelQuery: _ => cancelCount++
+        );
+
+        worker.Run();
+
+        executionCount.Should().Be(1);
+        cancelCount.Should().Be(1);
+
+        outputs.Should().HaveCount(1);
+        outputs[0].Error.Should().BeNull();
+        outputs[0].Finished.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Run_WhenAlreadyCancelled_DoesNotExecute()
+    {
+        var connection = new SqlConnection();
+        var command = new SqlCommand();
+        using var cancellationSource = new CancellationTokenSource();
+
+        cancellationSource.Cancel();
+
+        var outputs = new List<QueryOutput>();
+        var executionCount = 0;
+
+        using var worker = new QueryInput(
+            connection,
+            command,
+            iterations: 3,
+            outputs.Add,
+            _ => { },
+            _ => executionCount++,
+            _ => { },
+            paramServer: null,
+            queryDelay: 0,
+            cancellationToken: cancellationSource.Token
+        );
+        
+        worker.Run();
+
+        executionCount.Should().Be(0);
+        outputs.Should().BeEmpty();
+    }
 }

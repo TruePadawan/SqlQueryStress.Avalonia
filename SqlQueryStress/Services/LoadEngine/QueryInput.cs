@@ -18,13 +18,17 @@ internal sealed class QueryInput : IDisposable
     private readonly Action<SqlCommand> _executeQuery;
     private readonly Action<SqlConnection> _closeConnection;
 
+    private readonly CancellationToken _cancellationToken;
+    private readonly Action<SqlCommand> _cancelQuery;
+
     internal QueryInput(
         SqlConnection connection,
         SqlCommand queryCommand,
         int iterations,
         Action<QueryOutput> publishOutput,
         ParamServer? paramServer = null,
-        int queryDelay = 0)
+        int queryDelay = 0,
+        CancellationToken cancellationToken = default)
         : this(
             connection,
             queryCommand,
@@ -34,7 +38,9 @@ internal sealed class QueryInput : IDisposable
             static command => command.ExecuteNonQuery(),
             static connection => connection.Close(),
             paramServer,
-            queryDelay)
+            queryDelay,
+            cancellationToken,
+            static command => command.Cancel())
     {
     }
 
@@ -47,7 +53,9 @@ internal sealed class QueryInput : IDisposable
         Action<SqlCommand> executeQuery,
         Action<SqlConnection> closeConnection,
         ParamServer? paramServer,
-        int queryDelay = 0)
+        int queryDelay = 0,
+        CancellationToken cancellationToken = default,
+        Action<SqlCommand>? cancelQuery = null)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(queryCommand);
@@ -68,7 +76,9 @@ internal sealed class QueryInput : IDisposable
         _publishOutput = publishOutput;
         _paramServer = paramServer;
         _queryDelay = queryDelay;
-        
+        _cancellationToken = cancellationToken;
+        _cancelQuery = cancelQuery ?? (Action<SqlCommand>)(static command => command.Cancel());
+
         _openConnection = openConnection;
         _executeQuery = executeQuery;
         _closeConnection = closeConnection;
@@ -92,8 +102,23 @@ internal sealed class QueryInput : IDisposable
 
     internal void Run()
     {
+        var queryExecuting = 0;
+        
+        // Cancellation can arrive from another thread
+        // only cancel the command while query execution is in progress
+        using var cancellationRegistration =
+            _cancellationToken.Register(() =>
+                {
+                    if (Volatile.Read(ref queryExecuting) == 1)
+                        _cancelQuery(_queryCommand);
+                }
+            );
+
         for (var i = 0; i < _iterations; i++)
         {
+            if (_cancellationToken.IsCancellationRequested)
+                break;
+
             Exception? error = null;
             var stopwatch = new Stopwatch();
 
@@ -102,24 +127,31 @@ internal sealed class QueryInput : IDisposable
                 _openConnection(_connection);
 
                 if (_paramServer is not null)
-                {
                     _paramServer.PopulateNextRow(
                         _queryCommand.Parameters);
-                }
 
+                if (_cancellationToken.IsCancellationRequested)
+                    break;
+
+                Volatile.Write(ref queryExecuting, 1);
+                
+                // Measure query execution only; connection setup and parameter rotation
+                // are intentionally excluded from the client-side execution time
                 stopwatch.Start();
                 _executeQuery(_queryCommand);
                 stopwatch.Stop();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 if (stopwatch.IsRunning)
                     stopwatch.Stop();
 
-                error = ex;
+                if (!_cancellationToken.IsCancellationRequested)
+                    error = exception;
             }
             finally
             {
+                Volatile.Write(ref queryExecuting, 0);
                 _closeConnection(_connection);
             }
 
@@ -131,8 +163,16 @@ internal sealed class QueryInput : IDisposable
                     Finished = i == _iterations - 1
                 });
             
+            // cancellation might have occured while opening the connection
+            // or preparing the next parameter row
+            if (_cancellationToken.IsCancellationRequested)
+                break;
+            
+            // use a cancellation-aware wait so that a worker doesn't remain blocked
+            // in the inter-query delay after the load has been cancelled
             if(_queryDelay > 0 && i < _iterations - 1)
-                Thread.Sleep(_queryDelay);
+                if (_cancellationToken.WaitHandle.WaitOne(_queryDelay))
+                    break;
         }
     }
 
