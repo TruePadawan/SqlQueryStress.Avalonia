@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
 
-namespace SqlQueryStress.Tests;
+namespace SqlQueryStress.Tests.Services;
 
 public class ParamServerTests
 {
