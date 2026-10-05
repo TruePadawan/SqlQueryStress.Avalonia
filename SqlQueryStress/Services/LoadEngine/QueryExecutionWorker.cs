@@ -5,7 +5,10 @@ using Microsoft.Data.SqlClient;
 
 namespace SqlQueryStress.Services.LoadEngine;
 
-internal sealed class QueryInput : IDisposable
+/// <summary>
+/// Represents a worker that executes an SQL query
+/// </summary>
+internal sealed class QueryExecutionWorker : IDisposable
 {
     private readonly SqlConnection _connection;
     private readonly SqlCommand _queryCommand;
@@ -21,7 +24,7 @@ internal sealed class QueryInput : IDisposable
     private readonly CancellationToken _cancellationToken;
     private readonly Action<SqlCommand> _cancelQuery;
 
-    internal QueryInput(
+    internal QueryExecutionWorker(
         SqlConnection connection,
         SqlCommand queryCommand,
         int iterations,
@@ -44,7 +47,7 @@ internal sealed class QueryInput : IDisposable
     {
     }
 
-    internal QueryInput(
+    internal QueryExecutionWorker(
         SqlConnection connection,
         SqlCommand queryCommand,
         int iterations,

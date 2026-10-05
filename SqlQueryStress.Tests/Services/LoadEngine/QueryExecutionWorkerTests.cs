@@ -6,7 +6,7 @@ using SqlQueryStress.Services.LoadEngine;
 
 namespace SqlQueryStress.Tests.Services.LoadEngine;
 
-public class QueryInputTests
+public class QueryExecutionWorkerTests
 {
     [Fact]
     public void Run_ExecutesConfiguredIterationsAndPublishesOutputs()
@@ -19,7 +19,7 @@ public class QueryInputTests
         var openCount = 0;
         var closeCount = 0;
 
-        using var worker = new QueryInput(
+        using var worker = new QueryExecutionWorker(
             connection,
             command,
             iterations: 3,
@@ -61,7 +61,7 @@ public class QueryInputTests
 
         var expectedException = new InvalidOperationException("query failed");
 
-        using var worker = new QueryInput(
+        using var worker = new QueryExecutionWorker(
             connection,
             command,
             iterations: 2,
@@ -113,7 +113,7 @@ public class QueryInputTests
         var outputs = new List<QueryOutput>();
         var observedValues = new List<int>();
 
-        using var worker = new QueryInput(
+        using var worker = new QueryExecutionWorker(
             connection,
             command,
             iterations: 2,
@@ -148,7 +148,7 @@ public class QueryInputTests
 
         var stopwatch = Stopwatch.StartNew();
 
-        using var worker = new QueryInput(
+        using var worker = new QueryExecutionWorker(
             connection,
             command,
             iterations: 2,
@@ -173,7 +173,7 @@ public class QueryInputTests
         var executionCount = 0;
         var cancelCount = 0;
 
-        using var worker = new QueryInput(
+        using var worker = new QueryExecutionWorker(
             connection,
             command,
             iterations: 3,
@@ -213,7 +213,7 @@ public class QueryInputTests
         var outputs = new List<QueryOutput>();
         var executionCount = 0;
 
-        using var worker = new QueryInput(
+        using var worker = new QueryExecutionWorker(
             connection,
             command,
             iterations: 3,
