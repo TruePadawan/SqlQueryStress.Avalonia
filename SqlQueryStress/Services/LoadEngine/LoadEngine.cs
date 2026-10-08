@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 namespace SqlQueryStress.Services.LoadEngine;
 
 /// <summary>
-/// Coordinates query workers and their dedicated execution threads
+/// coordinates query workers and their dedicated execution threads
 /// </summary>
 internal sealed class LoadEngine : IDisposable
 {
@@ -23,6 +23,12 @@ internal sealed class LoadEngine : IDisposable
             lock (_outputLock)
                 return [.. _outputs];
         }
+    }
+
+    internal void AddWorker(QueryWorker worker)
+    {
+        ArgumentNullException.ThrowIfNull(worker);
+        _workers.Add(worker);
     }
 
     internal void AddWorker(
