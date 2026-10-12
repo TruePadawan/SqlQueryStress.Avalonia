@@ -132,11 +132,44 @@ public class DbConnectionService : IDbConnectionService
         }
     }
 
+    /// <inheritdoc/>
+    public async Task<bool> ExecuteCommandAsync(
+        DbConnectionInfo dbConnectionInfo,
+        string commandText
+    )
+    {
+        if (string.IsNullOrWhiteSpace(commandText))
+            return false;
+
+        if (!HasValidConnectionDetails(dbConnectionInfo))
+            return false;
+
+        var connectionString = ConnectionStringBuilder.Build(dbConnectionInfo, connectionTimeout: 0);
+
+        using var connection = new SqlConnection(connectionString);
+        ConnectionSettingsHelper.AttachEventHandler(connection);
+
+        try
+        {
+            await connection.OpenAsync();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+            using var command = new SqlCommand(commandText, connection);
+#pragma warning restore CA2100
+            await command.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Failed to execute command: {e}");
+            return false;
+        }
+    }
+
     private static bool HasValidConnectionDetails(DbConnectionInfo info)
     {
         if (string.IsNullOrEmpty(info.Server))
             return false;
-        
+
         var usesSqlServerAuthentication = info.Authentication == AuthenticationMode.SqlServer;
         var eitherCredentialIsEmpty = string.IsNullOrEmpty(info.Password) || string.IsNullOrEmpty(info.Login);
 

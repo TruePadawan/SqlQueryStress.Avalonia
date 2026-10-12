@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SqlQueryStress.Services.BenchmarkExportService;
 using SqlQueryStress.Services.DbConnectionService;
 using SqlQueryStress.Services.OptionsService;
 using SqlQueryStress.Services.ParameterSubstitutionService;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
             collection.AddSingleton<IParameterSubstitutionService, ParameterSubstitutionService>();
             collection.AddSingleton<IQuerySettingsService, QuerySettingsService>();
             collection.AddSingleton<ISettingsFileService, SettingsFileService>();
+            collection.AddSingleton<IBenchmarkExportService, BenchmarkExportService>();
         }
 
         public void RegisterViewModels()

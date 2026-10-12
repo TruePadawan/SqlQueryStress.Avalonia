@@ -1,6 +1,7 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
@@ -33,6 +34,13 @@ public partial class MainView : ContentPage
             if (DataContext is MainViewModel vm)
             {
                 vm.StorageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
+                vm.ClipboardWriter = text =>
+                    TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(text) ?? Task.CompletedTask;
+                vm.ShowMessage = async (message, title) =>
+                {
+                    if (TopLevel.GetTopLevel(this) is Window window)
+                        await new MessageWindow(message, title).ShowDialog(window);
+                };
             }
         };
     }
@@ -70,14 +78,13 @@ public partial class MainView : ContentPage
         try
         {
             var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
-            // TODO: Replace sample data with actual exception data from the stress test engine
-            var exceptions = new ObservableCollection<ExceptionItem>
-            {
-                new(2, "Divide by zero error encountered."),
-            };
+
+            if (DataContext is not MainViewModel vm)
+                return;
+
             var exceptionsWindow = new ExceptionsWindow
             {
-                DataContext = new ExceptionsViewModel(exceptions),
+                DataContext = new ExceptionsViewModel(vm.Exceptions),
             };
             await exceptionsWindow.ShowDialog(mainWindow!);
         }

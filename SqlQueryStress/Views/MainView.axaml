@@ -29,9 +29,12 @@
                 <MenuItem Header="_Load Settings"
                           Command="{Binding LoadSettingsCommand}" />
                 <MenuItem Header="Save Benchmark">
-                    <MenuItem Header="To CSV" />
-                    <MenuItem Header="To Text" />
-                    <MenuItem Header="To Clipboard" />
+                    <MenuItem Header="To CSV"
+                              Command="{Binding SaveBenchmarkToCsvCommand}" />
+                    <MenuItem Header="To Text"
+                              Command="{Binding SaveBenchmarkToTextCommand}" />
+                    <MenuItem Header="To Clipboard"
+                              Command="{Binding SaveBenchmarkToClipboardCommand}" />
                 </MenuItem>
                 <MenuItem Header="_Exit"
                           Command="{Binding ExitCommand}" />
@@ -140,11 +143,15 @@
 
                                 <Button Grid.Row="0"
                                         Grid.Column="0"
-                                        Content="Clean Buffers" />
+                                        Content="Clean Buffers"
+                                        Command="{Binding CleanBuffersCommand}"
+                                        IsEnabled="{Binding !IsRunning}" />
 
                                 <Button Grid.Row="0"
                                         Grid.Column="1"
-                                        Content="Free Cache" />
+                                        Content="Free Cache"
+                                        Command="{Binding FreeCacheCommand}"
+                                        IsEnabled="{Binding !IsRunning}" />
 
                                 <Button Grid.Row="1"
                                         Grid.Column="0"

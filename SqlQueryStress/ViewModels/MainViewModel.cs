@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +15,12 @@ using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Data.SqlClient;
+using SqlQueryStress.Models;
+using SqlQueryStress.Services.BenchmarkExportService;
 using SqlQueryStress.Services.DbConnectionService;
 using SqlQueryStress.Services.LoadEngine;
 using SqlQueryStress.Services.OptionsService;
+using SqlQueryStress.Services.ParameterSubstitutionService;
 using SqlQueryStress.Services.QuerySettingsService;
 using SqlQueryStress.Services.SettingsFileService;
 
@@ -22,15 +28,29 @@ namespace SqlQueryStress.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    private const string AppTitle = "SqlQueryStress";
+
     private readonly IQuerySettingsService _querySettingsService;
     private readonly ISettingsFileService _settingsFileService;
     private readonly IDbConnectionService _dbConnectionService;
     private readonly IOptionsService _optionsService;
+    private readonly IParameterSubstitutionService _parameterSubstitutionService;
+    private readonly IBenchmarkExportService _benchmarkExportService;
 
     /// <summary>
     /// Set by the View after creation to enable file picker dialogs from commands.
     /// </summary>
     public IStorageProvider? StorageProvider { get; set; }
+
+    /// <summary>
+    /// Set by the View after creation to enable text/csv exports to the clipboard.
+    /// </summary>
+    public Func<string, Task>? ClipboardWriter { get; set; }
+
+    /// <summary>
+    /// Set by the View after creation to display modal messages (mirrors the original app's MessageBox).
+    /// </summary>
+    public Func<string, string, Task>? ShowMessage { get; set; }
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -61,20 +81,34 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] public partial double ProgressValue { get; set; }
     [ObservableProperty] public partial double ProgressMaximum { get; set; } = 1;
 
+    /// <summary>
+    /// Deduplicated exceptions from the current run, shown in the Exceptions window.
+    /// </summary>
+    public ObservableCollection<ExceptionItem> Exceptions { get; } = [];
+
+    private readonly Dictionary<string, int> _exceptionCounts = new(StringComparer.Ordinal);
+
     private CancellationTokenSource? _runCancellation;
     private int _runVersion;
+    private Guid _testGuid;
+    private DateTime _testStartTime;
+    private BenchmarkResult? _lastResult;
 
     public MainViewModel(
         IQuerySettingsService querySettingsService,
         ISettingsFileService settingsFileService,
         IDbConnectionService dbConnectionService,
-        IOptionsService optionsService
+        IOptionsService optionsService,
+        IParameterSubstitutionService parameterSubstitutionService,
+        IBenchmarkExportService benchmarkExportService
     )
     {
         _querySettingsService = querySettingsService;
         _settingsFileService = settingsFileService;
         _dbConnectionService = dbConnectionService;
         _optionsService = optionsService;
+        _parameterSubstitutionService = parameterSubstitutionService;
+        _benchmarkExportService = benchmarkExportService;
 
         NumIterations = _querySettingsService.NumIterations;
         NumThreads = _querySettingsService.NumThreads;
@@ -123,6 +157,14 @@ public partial class MainViewModel : ViewModelBase
         if (IsRunning || HasInvalidQuerySettings() || string.IsNullOrWhiteSpace(MainQueryDocument.Text))
             return;
 
+        var connectionInfo = MainConnectionInfo;
+
+        if (!await _dbConnectionService.TestConnectionAsync(connectionInfo, _optionsService.ConnectionTimeout))
+        {
+            await NotifyAsync("Set valid database connection information before starting a load test.", AppTitle);
+            return;
+        }
+
         IsRunning = true;
         _runCancellation = new CancellationTokenSource();
 
@@ -132,29 +174,62 @@ public partial class MainViewModel : ViewModelBase
         using var engine = new LoadEngine();
         var iterations = NumIterations;
         var threadCount = NumThreads;
-        var startupError = false;
+
+        _testStartTime = DateTime.Now;
+        _testGuid = Guid.NewGuid();
 
         try
         {
-            var connectionInfo = _dbConnectionService.MainDbConnectionInfo with
+            // Match the original engine: tie the connection pool to the worker count
+            var poolBuilder = new SqlConnectionStringBuilder(
+                ConnectionStringBuilder.Build(connectionInfo, _optionsService.ConnectionTimeout))
             {
-                EnablePooling = _optionsService.EnableConnectionPooling
+                MinPoolSize = threadCount,
+                MaxPoolSize = threadCount,
+                CurrentLanguage = "English"
             };
+            var connectionString = poolBuilder.ConnectionString;
 
-            var connectionString = ConnectionStringBuilder.Build(
-                connectionInfo,
-                _optionsService.ConnectionTimeout);
+            // Prime the connection pool so the workers don't stall allocating connections
+            using (var primingConnection = new SqlConnection(connectionString))
+            {
+                SqlConnection.ClearPool(primingConnection);
+                primingConnection.Open();
+            }
 
             var query = MainQueryDocument.Text;
             var queryDelay = DelayBetweenQueries;
             var collectIoStats = _optionsService.CollectIOStatistics;
             var collectTimeStats = _optionsService.CollectTimeStatistics;
+            var activeMappings = _parameterSubstitutionService.ParameterMappings
+                .Where(mapping => !string.IsNullOrWhiteSpace(mapping.Value.ColumnName))
+                .ToDictionary(mapping => mapping.Key, mapping => mapping.Value);
+
+            ParamServer? paramServer = null;
+
+            if (activeMappings.Count > 0)
+            {
+                var paramConnectionInfo = (_dbConnectionService.ShareDbSettings
+                    ? _dbConnectionService.MainDbConnectionInfo
+                    : _dbConnectionService.ParamDbConnectionInfo) with
+                {
+                    EnablePooling = _optionsService.EnableConnectionPooling
+                };
+
+                paramServer = await ParamServer.CreateAsync(
+                    _parameterSubstitutionService.ParameterQuery,
+                    ConnectionStringBuilder.Build(paramConnectionInfo, _optionsService.ConnectionTimeout),
+                    activeMappings,
+                    cancellationToken);
+            }
 
             ResetStatistics(threadCount * iterations, threadCount);
 
             for (var i = 0; i < threadCount; i++)
             {
                 var connection = new SqlConnection(connectionString);
+                ConnectionSettingsHelper.AttachEventHandler(connection);
+
                 var command = new SqlCommand(query, connection)
                 {
                     CommandTimeout = _optionsService.CommandTimeout
@@ -165,6 +240,7 @@ public partial class MainViewModel : ViewModelBase
                     command,
                     iterations,
                     output => PublishOutput(engine, output, stopwatch, threadCount, iterations, runVersion),
+                    paramServer: paramServer,
                     queryDelay: queryDelay,
                     cancellationToken: cancellationToken,
                     collectIoStats: collectIoStats,
@@ -184,20 +260,20 @@ public partial class MainViewModel : ViewModelBase
         catch (Exception exception)
         {
             Console.WriteLine($"Query execution failed: {exception}");
-            startupError = true;
+            await NotifyAsync($"The load test could not be started: {exception.Message}", AppTitle);
         }
         finally
         {
             stopwatch.Stop();
+            SqlConnection.ClearAllPools();
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 if (runVersion == Volatile.Read(ref _runVersion))
                 {
                     UpdateStatistics(engine.Outputs, stopwatch.Elapsed, threadCount, iterations, activeThreadCount: 0);
-
-                    if (startupError)
-                        TotalExceptionsText = "1";
+                    RefreshExceptions();
+                    _lastResult = BuildBenchmarkResult(engine.Outputs, stopwatch.Elapsed, threadCount, iterations);
                 }
 
                 IsRunning = false;
@@ -214,6 +290,149 @@ public partial class MainViewModel : ViewModelBase
         _runCancellation?.Cancel();
     }
 
+    [RelayCommand]
+    private async Task CleanBuffersAsync()
+    {
+        if (!await ConfirmValidConnectionAsync())
+            return;
+
+        // the original runs CHECKPOINT first, then drops clean buffers
+        await _dbConnectionService.ExecuteCommandAsync(MainConnectionInfo, "CHECKPOINT");
+
+        var success = await _dbConnectionService.ExecuteCommandAsync(MainConnectionInfo, "DBCC DROPCLEANBUFFERS");
+        await NotifyAsync(success ? "Buffers cleared" : "Errors encountered", AppTitle);
+    }
+
+    [RelayCommand]
+    private async Task FreeCacheAsync()
+    {
+        if (!await ConfirmValidConnectionAsync())
+            return;
+
+        var success = await _dbConnectionService.ExecuteCommandAsync(MainConnectionInfo, "DBCC FREEPROCCACHE");
+        await NotifyAsync(success ? "Cache freed" : "Errors encountered", AppTitle);
+    }
+
+    [RelayCommand]
+    private async Task SaveBenchmarkToTextAsync()
+    {
+        if (!TryGetLastResult(out var result))
+            return;
+
+        var file = await PickBenchmarkFileAsync("Text Files", "SqlQueryStressBenchmark.txt", "*.txt");
+        if (file is null)
+            return;
+
+        try
+        {
+            await using var stream = await file.OpenWriteAsync();
+            await _benchmarkExportService.ExportToTextAsync(stream, result);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Could not save benchmark, {exception.Message}");
+            await NotifyAsync($"Error While Saving Benchmark: make sure you have write privileges to '{file.Name}'", AppTitle);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveBenchmarkToCsvAsync()
+    {
+        if (!TryGetLastResult(out var result))
+            return;
+
+        var file = await PickBenchmarkFileAsync("CSV Files", "SqlQueryStressBenchmark.csv", "*.csv");
+        if (file is null)
+            return;
+
+        try
+        {
+            await using var stream = await file.OpenWriteAsync();
+            await _benchmarkExportService.ExportToCsvAsync(stream, result);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Could not save benchmark, {exception.Message}");
+            await NotifyAsync($"Error While Saving Benchmark: make sure you have write privileges to '{file.Name}'", AppTitle);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveBenchmarkToClipboardAsync()
+    {
+        if (!TryGetLastResult(out var result))
+            return;
+
+        if (ClipboardWriter is null)
+        {
+            await NotifyAsync("The clipboard is not available.", AppTitle);
+            return;
+        }
+
+        await ClipboardWriter(_benchmarkExportService.BuildText(result));
+    }
+
+    private DbConnectionInfo MainConnectionInfo => _dbConnectionService.MainDbConnectionInfo with
+    {
+        EnablePooling = _optionsService.EnableConnectionPooling
+    };
+
+    private async Task<bool> ConfirmValidConnectionAsync()
+    {
+        if (IsRunning)
+            return false;
+
+        if (!await _dbConnectionService.TestConnectionAsync(MainConnectionInfo, _optionsService.ConnectionTimeout))
+        {
+            await NotifyAsync("Set valid database connection information before running this operation.", AppTitle);
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool TryGetLastResult([NotNullWhen(true)] out BenchmarkResult? result)
+    {
+        if (_lastResult is null)
+        {
+            _ = NotifyAsync("Run a load test before exporting a benchmark.", AppTitle);
+            result = null;
+            return false;
+        }
+
+        result = _lastResult;
+        return true;
+    }
+
+    private async Task<IStorageFile?> PickBenchmarkFileAsync(string displayName, string suggestedName, string pattern)
+    {
+        if (StorageProvider is null)
+        {
+            await NotifyAsync("The file picker is not available.", AppTitle);
+            return null;
+        }
+
+        return await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Benchmark",
+            DefaultExtension = pattern[1..],
+            SuggestedFileName = suggestedName,
+            FileTypeChoices =
+            [
+                new FilePickerFileType(displayName) { Patterns = [pattern] },
+                new FilePickerFileType("All Files") { Patterns = ["*"] }
+            ]
+        });
+    }
+
+    private async Task NotifyAsync(string message, string title)
+    {
+        Console.WriteLine($"{title}: {message}");
+
+        if (ShowMessage is not null)
+            await ShowMessage(message, title);
+    }
+
     private void PublishOutput(
         LoadEngine engine,
         QueryOutput output,
@@ -226,9 +445,31 @@ public partial class MainViewModel : ViewModelBase
 
         _ = Dispatcher.UIThread.InvokeAsync(() =>
         {
-            if (runVersion == Volatile.Read(ref _runVersion))
-                UpdateStatistics(engine.Outputs, stopwatch.Elapsed, threadCount, iterations, engine.ActiveThreadCount);
+            if (runVersion != Volatile.Read(ref _runVersion))
+                return;
+
+            if (output.Error is not null)
+                RecordException(output.Error);
+
+            UpdateStatistics(engine.Outputs, stopwatch.Elapsed, threadCount, iterations, engine.ActiveThreadCount);
         });
+    }
+
+    private void RecordException(Exception exception)
+    {
+        var message = exception.Message;
+
+        // Match the original: strip the parsed time-statistics text from exception messages
+        if (_optionsService.CollectTimeStatistics)
+        {
+            var matchPos = message.IndexOf("SQL Server parse and compile time:", StringComparison.Ordinal);
+
+            if (matchPos > -1)
+                message = message[..Math.Max(0, matchPos - 2)];
+        }
+
+        if (!_exceptionCounts.TryAdd(message, 1))
+            _exceptionCounts[message] += 1;
     }
 
     private void ResetStatistics(int totalIterations, int threadCount)
@@ -243,6 +484,9 @@ public partial class MainViewModel : ViewModelBase
         ActiveThreadsText = totalIterations > 0 ? threadCount.ToString() : "0";
         ProgressValue = 0;
         ProgressMaximum = Math.Max(1, totalIterations);
+
+        _exceptionCounts.Clear();
+        Exceptions.Clear();
     }
 
     private void UpdateStatistics(
@@ -281,6 +525,63 @@ public partial class MainViewModel : ViewModelBase
         var total = threadCount * iterations;
         ProgressMaximum = Math.Max(1, total);
         ProgressValue = Math.Min(completed, ProgressMaximum);
+    }
+
+    private void RefreshExceptions()
+    {
+        Exceptions.Clear();
+
+        foreach (var pair in _exceptionCounts)
+            Exceptions.Add(new ExceptionItem(pair.Value, pair.Key));
+    }
+
+    private BenchmarkResult BuildBenchmarkResult(
+        IReadOnlyList<QueryOutput> outputs,
+        TimeSpan elapsed,
+        int threadCount,
+        int iterations)
+    {
+        var totalTime = 0.0;
+        var totalCpu = 0.0;
+        var totalElapsed = 0.0;
+        var totalReads = 0.0;
+        var timeMessages = 0;
+        var readMessages = 0;
+
+        foreach (var output in outputs)
+        {
+            totalTime += output.Time.TotalMilliseconds;
+
+            if (output.LogicalReads > 0)
+            {
+                readMessages++;
+                totalReads += output.LogicalReads;
+            }
+
+            if (output.ElapsedTime > 0)
+            {
+                timeMessages++;
+                totalCpu += output.CpuTime;
+                totalElapsed += output.ElapsedTime;
+            }
+        }
+
+        var completed = outputs.Count;
+
+        return new BenchmarkResult
+        {
+            TestId = _testGuid,
+            TestStartTime = _testStartTime,
+            Elapsed = elapsed,
+            NumIterations = iterations,
+            NumThreads = threadCount,
+            DelayBetweenQueries = DelayBetweenQueries,
+            CompletedIterations = completed,
+            AverageClientSeconds = completed == 0 ? 0.0 : totalTime / completed / 1000,
+            AverageCpuSeconds = timeMessages == 0 ? null : totalCpu / timeMessages / 1000,
+            AverageActualSeconds = timeMessages == 0 ? null : totalElapsed / timeMessages / 1000,
+            AverageLogicalReads = readMessages == 0 ? null : totalReads / readMessages
+        };
     }
 
     private bool HasInvalidQuerySettings() =>

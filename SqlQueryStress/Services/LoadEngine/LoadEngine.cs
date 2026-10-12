@@ -60,8 +60,10 @@ internal sealed class LoadEngine : IDisposable
     {
         Volatile.Write(ref _activeThreadCount, _workers.Count);
 
-        foreach (var worker in _workers)
+        for (var i = 0; i < _workers.Count; i++)
         {
+            var worker = _workers[i];
+
             var thread = new Thread(() =>
                 {
                     try
@@ -74,7 +76,9 @@ internal sealed class LoadEngine : IDisposable
                     }
                 })
             {
-                IsBackground = true
+                IsBackground = true,
+                Priority = ThreadPriority.BelowNormal,
+                Name = $"thread: {i}"
             };
 
             _threads.Add(thread);

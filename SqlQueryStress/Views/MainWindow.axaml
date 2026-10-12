@@ -20,9 +20,9 @@
                     <NativeMenuItem Header="_Load Settings" Command="{Binding LoadSettingsCommand}" />
                     <NativeMenuItem Header="Save Benchmark">
                         <NativeMenu>
-                            <NativeMenuItem Header="To CSV" />
-                            <NativeMenuItem Header="To Text" />
-                            <NativeMenuItem Header="To Clipboard" />
+                            <NativeMenuItem Header="To CSV" Command="{Binding SaveBenchmarkToCsvCommand}" />
+                            <NativeMenuItem Header="To Text" Command="{Binding SaveBenchmarkToTextCommand}" />
+                            <NativeMenuItem Header="To Clipboard" Command="{Binding SaveBenchmarkToClipboardCommand}" />
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="_Exit" Command="{Binding ExitCommand}" />

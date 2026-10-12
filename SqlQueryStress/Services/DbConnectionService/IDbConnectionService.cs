@@ -33,4 +33,12 @@ public interface IDbConnectionService
     /// <param name="connectionTimeout">Timeout in seconds</param>
     /// <returns>List of available databases, empty if non exist</returns>
     Task<IReadOnlyList<string>> GetDatabaseListAsync(DbConnectionInfo dbConnectionInfo, int connectionTimeout);
+
+    /// <summary>
+    /// Executes an arbitrary SQL command (e.g. CHECKPOINT, DBCC) against the supplied db connection settings
+    /// </summary>
+    /// <param name="dbConnectionInfo">DB connection settings to use</param>
+    /// <param name="commandText">SQL to execute</param>
+    /// <returns>true if the command succeeded, false otherwise</returns>
+    Task<bool> ExecuteCommandAsync(DbConnectionInfo dbConnectionInfo, string commandText);
 }
