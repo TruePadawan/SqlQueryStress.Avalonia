@@ -15,6 +15,7 @@ internal sealed class LoadEngine : IDisposable
     private readonly List<QueryOutput> _outputs = [];
 
     private readonly object _outputLock = new();
+    private int _activeThreadCount;
 
     internal IReadOnlyList<QueryOutput> Outputs
     {
@@ -24,6 +25,8 @@ internal sealed class LoadEngine : IDisposable
                 return [.. _outputs];
         }
     }
+
+    internal int ActiveThreadCount => Volatile.Read(ref _activeThreadCount);
 
     internal void AddWorker(QueryWorker worker)
     {
@@ -55,9 +58,21 @@ internal sealed class LoadEngine : IDisposable
 
     internal void Start()
     {
+        Volatile.Write(ref _activeThreadCount, _workers.Count);
+
         foreach (var worker in _workers)
         {
-            var thread = new Thread(worker.Run)
+            var thread = new Thread(() =>
+                {
+                    try
+                    {
+                        worker.Run();
+                    }
+                    finally
+                    {
+                        Interlocked.Decrement(ref _activeThreadCount);
+                    }
+                })
             {
                 IsBackground = true
             };

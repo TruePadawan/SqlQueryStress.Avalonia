@@ -14,12 +14,15 @@ internal sealed class QueryOutput
     
     public bool Finished { get; set; }
     
-    // populated later when STATISTICS IO/TIME support is ported
     public int LogicalReads { get; set; }
+
+    public bool HasIoStatistics { get; set; }
     
     public int CpuTime { get; set; }
     
     public int ElapsedTime { get; set; }
+
+    public bool HasTimeStatistics { get; set; }
     
     // Populated later by the outer LoadingEngine Orchestration
     public int ActiveThreads { get; set; }

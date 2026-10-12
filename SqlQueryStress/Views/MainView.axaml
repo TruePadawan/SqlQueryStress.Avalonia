@@ -1,12 +1,16 @@
+
 <ContentPage xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:SqlQueryStress.ViewModels"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="1000"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="1000"
              x:Class="SqlQueryStress.Views.MainView"
              x:DataType="vm:MainViewModel">
+
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -17,15 +21,20 @@
         <!-- App Menu -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Name="OptionsMenuItem" Header="_Options" Click="OptionsMenuItem_OnClick" />
-                <MenuItem Header="_Save Settings" Command="{Binding SaveSettingsCommand}" />
-                <MenuItem Header="_Load Settings" Command="{Binding LoadSettingsCommand}" />
+                <MenuItem Name="OptionsMenuItem"
+                          Header="_Options"
+                          Click="OptionsMenuItem_OnClick" />
+                <MenuItem Header="_Save Settings"
+                          Command="{Binding SaveSettingsCommand}" />
+                <MenuItem Header="_Load Settings"
+                          Command="{Binding LoadSettingsCommand}" />
                 <MenuItem Header="Save Benchmark">
                     <MenuItem Header="To CSV" />
                     <MenuItem Header="To Text" />
                     <MenuItem Header="To Clipboard" />
                 </MenuItem>
-                <MenuItem Header="_Exit" Command="{Binding ExitCommand}" />
+                <MenuItem Header="_Exit"
+                          Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About" />
@@ -34,101 +43,164 @@
 
         <DockPanel Background="{DynamicResource AppBackgroundBrush}">
             <ScrollViewer DockPanel.Dock="Right">
-                <Border
-                    Background="{DynamicResource PanelBackgroundBrush}"
-                    BorderBrush="{DynamicResource PanelBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{DynamicResource PanelCornerRadius}"
-                    Margin="4,8,8,8"
-                    Padding="14">
+                <Border Background="{DynamicResource PanelBackgroundBrush}"
+                        BorderBrush="{DynamicResource PanelBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{DynamicResource PanelCornerRadius}"
+                        Margin="4,8,8,8"
+                        Padding="14">
+
                     <DockPanel MinWidth="500">
+
                         <!-- TELEMETRY -->
                         <StackPanel Spacing="10" DockPanel.Dock="Bottom">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Elapsed Time" />
-                                <TextBox Classes="Telemetry" />
+                                <TextBox Classes="Telemetry"
+                                         Text="{Binding ElapsedTimeText}"
+                                         IsReadOnly="True" />
                             </StackPanel>
 
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Iterations Completed" />
-                                <TextBox Classes="Telemetry" />
+                                <TextBox Classes="Telemetry"
+                                         Text="{Binding IterationsCompletedText}"
+                                         IsReadOnly="True" />
                             </StackPanel>
 
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Client Seconds/Iteration (Avg)" />
-                                <TextBox Classes="Telemetry" />
+                                <TextBox Classes="Telemetry"
+                                         Text="{Binding AverageClientSecondsText}"
+                                         IsReadOnly="True" />
                             </StackPanel>
 
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Total Exceptions" />
                                 <DockPanel HorizontalSpacing="4">
-                                    <Button Name="ExceptionsButton" DockPanel.Dock="Right" Content="..."
+                                    <Button Name="ExceptionsButton"
+                                            DockPanel.Dock="Right"
+                                            Content="..."
                                             Click="ExceptionsButton_OnClick" />
-                                    <TextBox Classes="Telemetry" />
+                                    <TextBox Classes="Telemetry"
+                                             Text="{Binding TotalExceptionsText}"
+                                             IsReadOnly="True" />
                                 </DockPanel>
                             </StackPanel>
 
-                            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *" RowSpacing="10" ColumnSpacing="8">
-                                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
+                            <Grid ColumnDefinitions="*, *"
+                                  RowDefinitions="*, *"
+                                  RowSpacing="10"
+                                  ColumnSpacing="8">
+
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="0"
+                                            Spacing="4">
                                     <TextBlock Text="CPU Seconds/Iteration (Avg)" />
-                                    <TextBox Classes="Telemetry" />
+                                    <TextBox Classes="Telemetry"
+                                             Text="{Binding AverageCpuSecondsText}"
+                                             IsReadOnly="True" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="1"
+                                            Spacing="4">
                                     <TextBlock Text="Logical Reads/Iteration (Avg)" />
-                                    <TextBox Classes="Telemetry" />
+                                    <TextBox Classes="Telemetry"
+                                             Text="{Binding AverageLogicalReadsText}"
+                                             IsReadOnly="True" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="1" Grid.Column="0" Spacing="4">
+                                <StackPanel Grid.Row="1"
+                                            Grid.Column="0"
+                                            Spacing="4">
                                     <TextBlock Text="Actual Seconds/Iteration (Avg)" />
-                                    <TextBox Classes="Telemetry" />
+                                    <TextBox Classes="Telemetry"
+                                             Text="{Binding AverageActualSecondsText}"
+                                             IsReadOnly="True" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
+                                <StackPanel Grid.Row="1"
+                                            Grid.Column="1"
+                                            Spacing="4">
                                     <TextBlock Text="Active Threads" />
-                                    <TextBox Classes="Telemetry" />
+                                    <TextBox Classes="Telemetry"
+                                             Text="{Binding ActiveThreadsText}"
+                                             IsReadOnly="True" />
                                 </StackPanel>
                             </Grid>
-
                         </StackPanel>
 
                         <StackPanel Spacing="14">
-                            <Grid ColumnDefinitions="*, *" RowDefinitions="32, 44" RowSpacing="8" ColumnSpacing="8">
-                                <Button Grid.Row="0" Grid.Column="0" Content="Clean Buffers" />
-                                <Button Grid.Row="0" Grid.Column="1" Content="Free Cache" />
-                                <Button Grid.Row="1" Grid.Column="0"
+                            <!-- Run Controls -->
+                            <Grid ColumnDefinitions="*, *"
+                                  RowDefinitions="32, 44"
+                                  RowSpacing="8"
+                                  ColumnSpacing="8">
+
+                                <Button Grid.Row="0"
+                                        Grid.Column="0"
+                                        Content="Clean Buffers" />
+
+                                <Button Grid.Row="0"
+                                        Grid.Column="1"
+                                        Content="Free Cache" />
+
+                                <Button Grid.Row="1"
+                                        Grid.Column="0"
                                         Classes="GoButton"
                                         FontWeight="Bold"
                                         Background="SeaGreen"
                                         Foreground="White"
-                                        Content="Go" />
-                                <Button Grid.Row="1" Grid.Column="1" Content="Cancel" />
+                                        Content="Go"
+                                        Command="{Binding GoCommand}" />
+
+                                <Button Grid.Row="1"
+                                        Grid.Column="1"
+                                        Content="Cancel"
+                                        Command="{Binding CancelCommand}"
+                                        IsEnabled="{Binding IsRunning}" />
 
                                 <Grid.Styles>
                                     <!-- Go button hover / press -->
                                     <Style Selector="Button.GoButton:pointerover /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="MediumSeaGreen" />
-                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Background"
+                                                Value="MediumSeaGreen" />
+                                        <Setter Property="Foreground"
+                                                Value="White" />
                                     </Style>
+
                                     <Style Selector="Button.GoButton:pressed /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="Green" />
-                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Background"
+                                                Value="Green" />
+                                        <Setter Property="Foreground"
+                                                Value="White" />
                                     </Style>
                                 </Grid.Styles>
                             </Grid>
 
                             <!-- Separator -->
-                            <Rectangle Height="2" Fill="{DynamicResource SeparatorBackgroundBrush}" />
+                            <Rectangle Height="2"
+                                       Fill="{DynamicResource SeparatorBackgroundBrush}" />
 
+                            <!-- Database Actions -->
                             <StackPanel Spacing="8">
-                                <Button Content="Database" Height="32" Click="DatabaseButton_OnClick" />
-                                <Button Name="ParameterSubstitutionButton" Content="Parameter Substitution" Height="32"
+                                <Button Content="Database"
+                                        Height="32"
+                                        Click="DatabaseButton_OnClick" />
+
+                                <Button Name="ParameterSubstitutionButton"
+                                        Content="Parameter Substitution"
+                                        Height="32"
                                         Click="ParameterSubstitutionButton_OnClick" />
                             </StackPanel>
 
+                            <!-- Query Settings -->
                             <StackPanel Spacing="10">
                                 <StackPanel Spacing="4">
-                                    <Label Content="Number of Iterations" Target="IterationCountTextBox" />
+                                    <Label Content="Number of Iterations"
+                                           Target="IterationCountTextBox" />
+
                                     <NumericUpDown Name="IterationCountTextBox"
                                                    Minimum="1"
                                                    FormatString="0"
@@ -145,8 +217,11 @@
                                         </NumericUpDown.Value>
                                     </NumericUpDown>
                                 </StackPanel>
+
                                 <StackPanel Spacing="4">
-                                    <Label Content="Number of Threads" Target="ThreadsCountTextBox" />
+                                    <Label Content="Number of Threads"
+                                           Target="ThreadsCountTextBox" />
+
                                     <NumericUpDown Name="ThreadsCountTextBox"
                                                    Minimum="1"
                                                    FormatString="0"
@@ -161,11 +236,13 @@
                                                 </Binding.FallbackValue>
                                             </Binding>
                                         </NumericUpDown.Value>
-
                                     </NumericUpDown>
                                 </StackPanel>
+
                                 <StackPanel Spacing="4">
-                                    <Label Content="Delay between queries (ms)" Target="QueryDelayTextBox" />
+                                    <Label Content="Delay between queries (ms)"
+                                           Target="QueryDelayTextBox" />
+
                                     <NumericUpDown Name="QueryDelayTextBox"
                                                    Minimum="0"
                                                    FormatString="0"
@@ -180,28 +257,32 @@
                                                 </Binding.FallbackValue>
                                             </Binding>
                                         </NumericUpDown.Value>
-
                                     </NumericUpDown>
                                 </StackPanel>
                             </StackPanel>
 
                             <!-- Separator -->
-                            <Rectangle Height="2" Fill="{DynamicResource SeparatorBackgroundBrush}" />
+                            <Rectangle Height="2"
+                                       Fill="{DynamicResource SeparatorBackgroundBrush}" />
 
-                            <!-- ProgressBar -->
+                            <!-- Progress -->
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Progress" FontWeight="SemiBold" />
+                                <TextBlock Text="Progress"
+                                           FontWeight="SemiBold" />
                                 <ProgressBar Height="20" />
                             </StackPanel>
                         </StackPanel>
                     </DockPanel>
                 </Border>
             </ScrollViewer>
+
+            <!-- SQL Query Editor -->
             <Border Background="{DynamicResource PanelBackgroundBrush}"
                     BorderBrush="{DynamicResource PanelBorderBrush}"
                     BorderThickness="1"
-                    Margin="8, 8, 4, 8"
+                    Margin="8,8,4,8"
                     CornerRadius="{DynamicResource PanelCornerRadius}">
+
                 <avaloniaEdit:TextEditor Name="Editor"
                                          Document="{Binding MainQueryDocument}"
                                          ShowLineNumbers="True"

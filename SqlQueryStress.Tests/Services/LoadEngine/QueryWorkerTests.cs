@@ -202,6 +202,71 @@ public class QueryWorkerTests
     }
 
     [Fact]
+    public void Run_WhenCancelledAndKillQueriesOnCancelDisabled_DoesNotCancelActiveCommand()
+    {
+        var connection = new SqlConnection();
+        var command = new SqlCommand();
+        using var cancellationSource = new CancellationTokenSource();
+
+        var outputs = new List<QueryOutput>();
+        var executionCount = 0;
+        var cancelCount = 0;
+
+        using var worker = new QueryWorker(
+            connection,
+            command,
+            iterations: 3,
+            outputs.Add,
+            _ => { },
+            _ =>
+            {
+                executionCount++;
+                cancellationSource.Cancel();
+            },
+            _ => { },
+            paramServer: null,
+            queryDelay: 0,
+            cancellationToken: cancellationSource.Token,
+            cancelQuery: _ => cancelCount++,
+            killQueriesOnCancel: false
+        );
+
+        worker.Run();
+
+        executionCount.Should().Be(1);
+        cancelCount.Should().Be(0);
+
+        outputs.Should().HaveCount(1);
+        outputs[0].Error.Should().BeNull();
+        outputs[0].Finished.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ApplyStatisticsMessage_AddsAllLogicalReadsAndTimes()
+    {
+        var output = new QueryOutput();
+
+        QueryWorker.ApplyStatisticsMessage(
+            output,
+            """
+            Table 'Users'. Scan count 1, logical reads 12, physical reads 0.
+            Table 'Orders'. Scan count 1, logical reads 30, physical reads 0.
+
+             SQL Server parse and compile time:
+               CPU time = 2 ms, elapsed time = 3 ms.
+
+             SQL Server Execution Times:
+               CPU time = 8 ms, elapsed time = 13 ms.
+            """);
+
+        output.HasIoStatistics.Should().BeTrue();
+        output.LogicalReads.Should().Be(42);
+        output.HasTimeStatistics.Should().BeTrue();
+        output.CpuTime.Should().Be(10);
+        output.ElapsedTime.Should().Be(16);
+    }
+
+    [Fact]
     public void Run_WhenAlreadyCancelled_DoesNotExecute()
     {
         var connection = new SqlConnection();
