@@ -58,6 +58,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] public partial string AverageLogicalReadsText { get; set; } = "0";
     [ObservableProperty] public partial string AverageActualSecondsText { get; set; } = "0";
     [ObservableProperty] public partial string ActiveThreadsText { get; set; } = "0";
+    [ObservableProperty] public partial double ProgressValue { get; set; }
+    [ObservableProperty] public partial double ProgressMaximum { get; set; } = 1;
 
     private CancellationTokenSource? _runCancellation;
     private int _runVersion;
@@ -239,6 +241,8 @@ public partial class MainViewModel : ViewModelBase
         AverageLogicalReadsText = "0";
         AverageActualSecondsText = "0";
         ActiveThreadsText = totalIterations > 0 ? threadCount.ToString() : "0";
+        ProgressValue = 0;
+        ProgressMaximum = Math.Max(1, totalIterations);
     }
 
     private void UpdateStatistics(
@@ -273,6 +277,10 @@ public partial class MainViewModel : ViewModelBase
             outputsWithTimeStatistics.Sum(output => output.ElapsedTime) / (double)timeStatisticsDivisor / 1000).ToString("F3");
 
         ActiveThreadsText = Math.Max(0, activeThreadCount ?? threadCount - outputs.Count(output => output.Finished)).ToString();
+
+        var total = threadCount * iterations;
+        ProgressMaximum = Math.Max(1, total);
+        ProgressValue = Math.Min(completed, ProgressMaximum);
     }
 
     private bool HasInvalidQuerySettings() =>
