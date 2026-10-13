@@ -1,4 +1,6 @@
+using System;
 using SqlQueryStress.Models;
+using Models = SqlQueryStress.Models;
 
 namespace SqlQueryStress.DTOs;
 
@@ -44,13 +46,13 @@ public class DbConnectionInfoDto
             dto.IntegratedAuth ? AuthenticationMode.Integrated :
             AuthenticationMode.SqlServer;
 
-        var appIntent = System.Enum.IsDefined(typeof(ApplicationIntent), dto.ApplicationIntent)
+        var appIntent = Enum.IsDefined(typeof(ApplicationIntent), dto.ApplicationIntent)
             ? (ApplicationIntent)dto.ApplicationIntent
-            : SqlQueryStress.Models.ApplicationIntent.ReadWrite;
+            : Models.ApplicationIntent.ReadWrite;
 
-        var encryptOption = System.Enum.TryParse<EncryptOption>(dto.EncryptOption, true, out var enc)
+        var encryptOption = Enum.TryParse<EncryptOption>(dto.EncryptOption, true, out var enc)
             ? enc
-            : SqlQueryStress.Models.EncryptOption.False;
+            : Models.EncryptOption.False;
 
         return new DbConnectionInfo
         {
