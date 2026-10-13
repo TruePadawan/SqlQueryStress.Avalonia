@@ -151,8 +151,11 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Runs the configured query on all worker threads and refreshes the displayed statistics.
+    /// </summary>
     [RelayCommand]
-    private async Task GoAsync()
+    private async Task RunBenchmarks()
     {
         if (IsRunning || HasInvalidQuerySettings() || string.IsNullOrWhiteSpace(MainQueryDocument.Text))
             return;
@@ -284,12 +287,18 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Requests cancellation of the current run.
+    /// </summary>
     [RelayCommand]
     private void Cancel()
     {
         _runCancellation?.Cancel();
     }
 
+    /// <summary>
+    /// Runs CHECKPOINT followed by DBCC DROPCLEANBUFFERS on the main connection.
+    /// </summary>
     [RelayCommand]
     private async Task CleanBuffersAsync()
     {
@@ -303,6 +312,9 @@ public partial class MainViewModel : ViewModelBase
         await NotifyAsync(success ? "Buffers cleared" : "Errors encountered", AppTitle);
     }
 
+    /// <summary>
+    /// Runs DBCC FREEPROCCACHE on the main connection.
+    /// </summary>
     [RelayCommand]
     private async Task FreeCacheAsync()
     {
@@ -313,6 +325,9 @@ public partial class MainViewModel : ViewModelBase
         await NotifyAsync(success ? "Cache freed" : "Errors encountered", AppTitle);
     }
 
+    /// <summary>
+    /// Exports the last benchmark result to a text file chosen by the user.
+    /// </summary>
     [RelayCommand]
     private async Task SaveBenchmarkToTextAsync()
     {
@@ -335,6 +350,9 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Exports the last benchmark result to a CSV file chosen by the user.
+    /// </summary>
     [RelayCommand]
     private async Task SaveBenchmarkToCsvAsync()
     {
@@ -357,6 +375,9 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Copies the last benchmark result to the clipboard as text.
+    /// </summary>
     [RelayCommand]
     private async Task SaveBenchmarkToClipboardAsync()
     {
@@ -372,11 +393,17 @@ public partial class MainViewModel : ViewModelBase
         await ClipboardWriter(_benchmarkExportService.BuildText(result));
     }
 
+    /// <summary>
+    /// The main database connection settings with the current pooling option applied.
+    /// </summary>
     private DbConnectionInfo MainConnectionInfo => _dbConnectionService.MainDbConnectionInfo with
     {
         EnablePooling = _optionsService.EnableConnectionPooling
     };
 
+    /// <summary>
+    /// Returns true when no test is running and the main connection can be opened.
+    /// </summary>
     private async Task<bool> ConfirmValidConnectionAsync()
     {
         if (IsRunning)
@@ -391,6 +418,9 @@ public partial class MainViewModel : ViewModelBase
         return true;
     }
 
+    /// <summary>
+    /// Returns the benchmark result from the last run, or prompts when there is none.
+    /// </summary>
     private bool TryGetLastResult([NotNullWhen(true)] out BenchmarkResult? result)
     {
         if (_lastResult is null)
@@ -404,6 +434,9 @@ public partial class MainViewModel : ViewModelBase
         return true;
     }
 
+    /// <summary>
+    /// Shows a save dialog for a benchmark file and returns the chosen file.
+    /// </summary>
     private async Task<IStorageFile?> PickBenchmarkFileAsync(string displayName, string suggestedName, string pattern)
     {
         if (StorageProvider is null)
@@ -425,6 +458,9 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
+    /// <summary>
+    /// Writes a message to the console and shows it to the user when a dialog is available.
+    /// </summary>
     private async Task NotifyAsync(string message, string title)
     {
         Console.WriteLine($"{title}: {message}");
@@ -433,6 +469,9 @@ public partial class MainViewModel : ViewModelBase
             await ShowMessage(message, title);
     }
 
+    /// <summary>
+    /// Stores a worker output and refreshes the statistics on the UI thread.
+    /// </summary>
     private void PublishOutput(
         LoadEngine engine,
         QueryOutput output,
@@ -455,6 +494,9 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
+    /// <summary>
+    /// Adds an exception to the aggregated counts, stripping the time-statistics text when enabled.
+    /// </summary>
     private void RecordException(Exception exception)
     {
         var message = exception.Message;
@@ -472,6 +514,9 @@ public partial class MainViewModel : ViewModelBase
             _exceptionCounts[message] += 1;
     }
 
+    /// <summary>
+    /// Clears the statistics and exceptions for a new run.
+    /// </summary>
     private void ResetStatistics(int totalIterations, int threadCount)
     {
         ElapsedTimeText = "0";
@@ -489,8 +534,11 @@ public partial class MainViewModel : ViewModelBase
         Exceptions.Clear();
     }
 
+    /// <summary>
+    /// Recomputes the displayed statistics from the collected worker outputs.
+    /// </summary>
     private void UpdateStatistics(
-        System.Collections.Generic.IReadOnlyList<QueryOutput> outputs,
+        IReadOnlyList<QueryOutput> outputs,
         TimeSpan elapsed,
         int threadCount,
         int iterations,
@@ -527,6 +575,9 @@ public partial class MainViewModel : ViewModelBase
         ProgressValue = Math.Min(completed, ProgressMaximum);
     }
 
+    /// <summary>
+    /// Rebuilds the exceptions collection from the aggregated counts.
+    /// </summary>
     private void RefreshExceptions()
     {
         Exceptions.Clear();
@@ -535,6 +586,9 @@ public partial class MainViewModel : ViewModelBase
             Exceptions.Add(new ExceptionItem(pair.Value, pair.Key));
     }
 
+    /// <summary>
+    /// Builds a benchmark result from the collected worker outputs for export.
+    /// </summary>
     private BenchmarkResult BuildBenchmarkResult(
         IReadOnlyList<QueryOutput> outputs,
         TimeSpan elapsed,
@@ -584,6 +638,9 @@ public partial class MainViewModel : ViewModelBase
         };
     }
 
+    /// <summary>
+    /// Returns true when the query settings fail validation.
+    /// </summary>
     private bool HasInvalidQuerySettings() =>
         HasErrors ||
         NumIterations < 1 ||

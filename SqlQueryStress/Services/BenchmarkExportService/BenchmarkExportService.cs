@@ -21,6 +21,7 @@ public sealed class BenchmarkExportService : IBenchmarkExportService
     private const string CsvHeader =
         "TestId,TestStartTime,ElapsedTime,Iterations,Threads,Delay,CompletedIterations,AvgCPUSeconds,AvgActualSeconds,AvgClientSeconds,AvgLogicalReads";
 
+    /// <inheritdoc/>
     public string BuildText(BenchmarkResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
@@ -43,6 +44,7 @@ public sealed class BenchmarkExportService : IBenchmarkExportService
         return content.ToString();
     }
 
+    /// <inheritdoc/>
     public async Task ExportToTextAsync(string filePath, BenchmarkResult result)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePath);
@@ -51,6 +53,7 @@ public sealed class BenchmarkExportService : IBenchmarkExportService
         await ExportToTextAsync(stream, result);
     }
 
+    /// <inheritdoc/>
     public async Task ExportToTextAsync(Stream stream, BenchmarkResult result)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -61,6 +64,7 @@ public sealed class BenchmarkExportService : IBenchmarkExportService
         await writer.FlushAsync();
     }
 
+    /// <inheritdoc/>
     public async Task ExportToCsvAsync(string filePath, BenchmarkResult result)
     {
         ArgumentException.ThrowIfNullOrEmpty(filePath);
@@ -71,6 +75,7 @@ public sealed class BenchmarkExportService : IBenchmarkExportService
         await ExportToCsvAsync(stream, result, fileExists);
     }
 
+    /// <inheritdoc/>
     public Task ExportToCsvAsync(Stream stream, BenchmarkResult result)
     {
         ArgumentNullException.ThrowIfNull(stream);

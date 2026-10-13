@@ -160,7 +160,7 @@
                                         Background="SeaGreen"
                                         Foreground="White"
                                         Content="Go"
-                                        Command="{Binding GoCommand}" />
+                                        Command="{Binding RunBenchmarksCommand}" />
 
                                 <Button Grid.Row="1"
                                         Grid.Column="1"

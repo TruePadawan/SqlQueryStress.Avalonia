@@ -26,6 +26,10 @@ internal sealed class LoadEngine : IDisposable
         }
     }
 
+    /// <summary>
+    /// Number of worker threads that are still running. The backing field is set to the
+    /// worker count in <see cref="Start"/> and decremented as each thread finishes.
+    /// </summary>
     internal int ActiveThreadCount => Volatile.Read(ref _activeThreadCount);
 
     internal void AddWorker(QueryWorker worker)
@@ -56,8 +60,12 @@ internal sealed class LoadEngine : IDisposable
         _workers.Add(worker);
     }
 
+    /// <summary>
+    /// Starts a dedicated thread for each worker and returns immediately.
+    /// </summary>
     internal void Start()
     {
+        // Seed the active-thread count with the number of workers about to start
         Volatile.Write(ref _activeThreadCount, _workers.Count);
 
         for (var i = 0; i < _workers.Count; i++)
@@ -72,6 +80,7 @@ internal sealed class LoadEngine : IDisposable
                     }
                     finally
                     {
+                        // This thread is done, so it no longer counts as active
                         Interlocked.Decrement(ref _activeThreadCount);
                     }
                 })
