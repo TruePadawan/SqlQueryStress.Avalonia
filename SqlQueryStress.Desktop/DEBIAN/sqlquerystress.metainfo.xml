@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>SqlQueryStress.desktop</id>
+    <name>SqlQueryStress</name>
+    <summary>A cross-platform SQL Server benchmarking tool</summary>
+    <developer_name>Chisom Hermes Chigoziri</developer_name>
+    <developer_name>Abraham Semilore Bankole</developer_name>
+
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>MIT</project_license>
+
+    <description>
+        <p>
+            SqlQueryStress is a cross-platform SQL Server benchmarking tool that lets you
+            stress-test T-SQL queries with configurable concurrency, iterations, and parameter
+            substitution. It is an Avalonia port of the original Windows-only SqlQueryStress
+            application.
+        </p>
+        <p>Features:</p>
+        <ul>
+            <li>Multi-threaded query execution with configurable iterations</li>
+            <li>Real-time telemetry monitoring</li>
+            <li>Parameter substitution for data-driven load testing</li>
+            <li>SQL Server statistics collection (IO and TIME)</li>
+            <li>Buffer and cache management for reproducible results</li>
+            <li>Benchmark export to text, CSV, or clipboard</li>
+            <li>Settings persistence as JSON files</li>
+        </ul>
+    </description>
+
+    <launchable type="desktop-id">SqlQueryStress.desktop</launchable>
+
+    <kudos>
+        <kudo>HiDpiIcon</kudo>
+        <kudo>ModernToolkit</kudo>
+    </kudos>
+
+    <keywords>
+        <keyword>sql</keyword>
+        <keyword>benchmark</keyword>
+        <keyword>performance</keyword>
+        <keyword>tsql</keyword>
+        <keyword>sqlserver</keyword>
+    </keywords>
+
+    <url type="homepage">https://github.com/TruePadawan/SqlQueryStress</url>
+    <url type="bugtracker">https://github.com/TruePadawan/SqlQueryStress/issues</url>
+
+    <content_rating type="oars-1.1"/>
+</component>

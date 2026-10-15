@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=SqlQueryStress
+Comment=A cross-platform SQL Server benchmarking tool for stress-testing T-SQL queries
+Icon=sqlquerystress
+Exec=sqlquerystress
+StartupWMClass=sqlquerystress
+Terminal=false
+Type=Application
+Categories=Development;Database;
+GenericName=SQL Benchmark Tool
+Keywords=sql; benchmark; performance; tsql; sqlserver

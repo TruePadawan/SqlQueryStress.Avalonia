@@ -9,6 +9,7 @@
 
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>Assets\sqlquerystress.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,5 +25,11 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <AvaloniaResource Include="Assets\sqlquerystress.ico" />
+      <AvaloniaResource Include="DEBIAN\sqlquerystress.png" />
+      <AvaloniaResource Include="DEBIAN\sqlquerystress.svg" />
     </ItemGroup>
 </Project>
