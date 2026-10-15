@@ -3,7 +3,7 @@
 <!--    <Deploy />-->
 <!--  </Project>-->
   <Project Path="SqlQueryStress.Desktop/SqlQueryStress.Desktop.csproj" />
-  <Project Path="SqlQueryStress.Tests/SqlQueryStress.Tests.csproj" />
+  <Project Path="SqlQueryStress.UnitTests\SqlQueryStress.UnitTests.csproj" />
 <!--  <Project Path="SqlQueryStress.iOS/SqlQueryStress.iOS.csproj">-->
 <!--    <Deploy />-->
 <!--  </Project>-->

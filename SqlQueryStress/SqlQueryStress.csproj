@@ -26,6 +26,6 @@
 
 
     <ItemGroup>
-        <InternalsVisibleTo Include="SqlQueryStress.Tests" />
+        <InternalsVisibleTo Include="SqlQueryStress.UnitTests" />
     </ItemGroup>
 </Project>
