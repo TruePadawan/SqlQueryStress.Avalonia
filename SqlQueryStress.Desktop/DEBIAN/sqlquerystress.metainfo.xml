@@ -47,4 +47,9 @@
     <url type="bugtracker">https://github.com/TruePadawan/SqlQueryStress/issues</url>
 
     <content_rating type="oars-1.1"/>
+
+    <releases>
+        <release version="0.1.0-beta" date="2026-10-15"/>
+    </releases>
+
 </component>
