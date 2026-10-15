@@ -1,11 +1,5 @@
 <Solution>
-<!--  <Project Path="SqlQueryStress.Android/SqlQueryStress.Android.csproj">-->
-<!--    <Deploy />-->
-<!--  </Project>-->
   <Project Path="SqlQueryStress.Desktop/SqlQueryStress.Desktop.csproj" />
   <Project Path="SqlQueryStress.UnitTests\SqlQueryStress.UnitTests.csproj" />
-<!--  <Project Path="SqlQueryStress.iOS/SqlQueryStress.iOS.csproj">-->
-<!--    <Deploy />-->
-<!--  </Project>-->
   <Project Path="SqlQueryStress/SqlQueryStress.csproj" />
 </Solution>
