@@ -107,4 +107,18 @@ public partial class MainView : ContentPage
             Console.WriteLine($"Could not open Parameter Substitution window, {exception.Message}");
         }
     }
+
+    private async void AboutMenuItem_OnClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var mainWindow = TopLevel.GetTopLevel(this) as MainWindow;
+            var aboutWindow = new AboutWindow();
+            await aboutWindow.ShowDialog(mainWindow!);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Could not open About window, {exception.Message}");
+        }
+    }
 }

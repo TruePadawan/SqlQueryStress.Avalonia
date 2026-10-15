@@ -1,0 +1,81 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="SqlQueryStress.Views.AboutWindow"
+        Title="About SqlQueryStress"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource PanelBackgroundBrush}"
+        Width="420">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Bottom"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Name="OkButton" Content="OK" Width="120" Click="OkButton_OnClick" />
+        </StackPanel>
+
+        <StackPanel HorizontalAlignment="Center" Spacing="12">
+            <!-- App Icon -->
+            <Image Source="avares://SqlQueryStress/Assets/sqlquerystress.png"
+                   Width="96" Height="96"
+                   Stretch="Uniform" />
+
+            <!-- App Name & Version -->
+            <TextBlock Text="SqlQueryStress"
+                       FontWeight="Bold"
+                       FontSize="22"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="Version 0.1.0-beta"
+                       FontSize="14"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+            <!-- Separator -->
+            <Separator Width="300" Margin="0,4,0,4" />
+
+            <!-- Description -->
+            <TextBlock Text="A cross-platform SQL Server benchmarking tool for stress-testing T-SQL queries."
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       MaxWidth="380" />
+
+            <!-- Separator -->
+            <Separator Width="300" Margin="0,4,0,4" />
+
+            <!-- Maintainers -->
+            <TextBlock FontWeight="Bold" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+                Maintainers
+            </TextBlock>
+            <TextBlock Text="Chisom Hermes Chigoziri"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <TextBlock Text="Abraham Semilore Bankole"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+            <!-- Separator -->
+            <Separator Width="300" Margin="0,4,0,4" />
+
+            <!-- License -->
+            <TextBlock FontWeight="Bold" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+                License
+            </TextBlock>
+            <TextBlock HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                <Run Text="MIT License" />
+            </TextBlock>
+
+            <!-- Links -->
+            <Separator Width="300" Margin="0,4,0,4" />
+            <HyperlinkButton NavigateUri="https://github.com/TruePadawan/SqlQueryStress"
+                             Content="GitHub Repository" />
+            <HyperlinkButton NavigateUri="https://github.com/TruePadawan/SqlQueryStress/issues"
+                             Content="Report an Issue" />
+        </StackPanel>
+    </DockPanel>
+</Window>

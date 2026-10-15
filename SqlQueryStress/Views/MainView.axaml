@@ -40,7 +40,7 @@
                           Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="About" />
+                <MenuItem Header="_About" Click="AboutMenuItem_OnClick" />
             </MenuItem>
         </Menu>
 
