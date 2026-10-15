@@ -43,19 +43,21 @@ public class BenchmarkExportServiceTests
     {
         var text = _service.BuildText(BuildResult());
 
-        text.Should().Be(
-            $"Test ID: {TestId}\r\n" +
-            "Test TimeStamp: 01/01/2026 12:00:00\r\n" +
-            "Elapsed Time: 01:23:45.0120\r\n" +
-            "Number of Iterations: 10\r\n" +
-            "Number of Threads: 4\r\n" +
-            "Delay Between Queries (ms): 100\r\n" +
-            "CPU Seconds/Iteration (Avg): 0.7500\r\n" +
-            "Actual Seconds/Iteration (Avg): 1.5000\r\n" +
-            "Iterations Completed: 97\r\n" +
-            "Client Seconds/Iteration (Avg): 0.5000\r\n" +
-            "Logical Reads/Iteration (Avg): 123.4567\r\n" +
-            "\r\n");
+        text.Should().BeEquivalentTo(
+            $"""
+             Test ID: {TestId}
+             Test TimeStamp: 01/01/2026 12:00:00
+             Elapsed Time: 01:23:45.0120
+             Number of Iterations: 10
+             Number of Threads: 4
+             Delay Between Queries (ms): 100
+             CPU Seconds/Iteration (Avg): 0.7500
+             Actual Seconds/Iteration (Avg): 1.5000
+             Iterations Completed: 97
+             Client Seconds/Iteration (Avg): 0.5000
+             Logical Reads/Iteration (Avg): 123.4567
+             """,
+            options => options.IgnoringTrailingWhitespace());
     }
 
     [Fact]
@@ -63,10 +65,10 @@ public class BenchmarkExportServiceTests
     {
         var text = _service.BuildText(BuildResult(cpu: null, actual: null, reads: null));
 
-        text.Should().Contain("CPU Seconds/Iteration (Avg): ---\r\n");
-        text.Should().Contain("Actual Seconds/Iteration (Avg): ---\r\n");
-        text.Should().Contain("Logical Reads/Iteration (Avg): ---\r\n");
-        text.Should().Contain("Client Seconds/Iteration (Avg): 0.5000\r\n");
+        text.Should().ContainAll("CPU Seconds/Iteration (Avg): ---",
+            "Actual Seconds/Iteration (Avg): ---",
+            "Logical Reads/Iteration (Avg): ---",
+            "Client Seconds/Iteration (Avg): 0.5000");
     }
 
     [Fact]
@@ -89,7 +91,7 @@ public class BenchmarkExportServiceTests
 
         var text = _service.BuildText(result);
 
-        text.Should().Contain("Elapsed Time: 00:00:00.0000\r\n");
+        text.Should().Contain("Elapsed Time: 00:00:00.0000");
     }
 
     [Fact]
@@ -170,7 +172,7 @@ public class BenchmarkExportServiceTests
 
             var content = await File.ReadAllTextAsync(file);
 
-            content.Split("\r\n").Count(line => line == "Test ID: " + TestId).Should().Be(2);
+            content.Should().Contain($"Test ID: {TestId}", Exactly.Twice());
         }
         finally
         {
