@@ -1,9 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
-using LoadEngineService = SqlQueryStress.Services.LoadEngine.LoadEngine;
 
-namespace SqlQueryStress.Tests.Services.LoadEngine;
+namespace SqlQueryStress.UnitTests.ServiceTests;
 
 public class LoadEngineTests
 {
@@ -13,7 +12,7 @@ public class LoadEngineTests
         var outputs = new List<QueryOutput>();
         var outputLock = new object();
 
-        using var engine = new LoadEngineService();
+        using var engine = new LoadEngine();
 
         for (var i = 0; i < 2; i++)
         {
@@ -47,7 +46,7 @@ public class LoadEngineTests
     [Fact]
     public void WaitForCompletion_ShouldAwaitForAllWorkers()
     {
-        using var engine = new LoadEngineService();
+        using var engine = new LoadEngine();
 
         var executionCompleted = false;
 
@@ -80,7 +79,7 @@ public class LoadEngineTests
     [Fact]
     public void Outputs_ShouldContainAllWorkerResults()
     {
-        using var engine = new LoadEngineService();
+        using var engine = new LoadEngine();
 
         var connection = new SqlConnection();
         var command = new SqlCommand();
@@ -95,13 +94,13 @@ public class LoadEngineTests
             closeConnection: _ => { },
             paramServer: null
         );
-        
+
         engine.AddWorker(worker);
-        
+
         engine.Start();
         engine.WaitForCompletion();
 
         engine.Outputs.Should().HaveCount(2);
-        engine.Outputs.Should().OnlyContain( output => output.Error == null);
+        engine.Outputs.Should().OnlyContain(output => output.Error == null);
     }
 }

@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
 
-namespace SqlQueryStress.Tests.Services.LoadEngine;
+namespace SqlQueryStress.UnitTests.ServiceTests;
 
 public class QueryWorkerTests
 {

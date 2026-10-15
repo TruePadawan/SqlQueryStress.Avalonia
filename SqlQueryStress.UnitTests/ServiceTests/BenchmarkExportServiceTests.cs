@@ -1,9 +1,9 @@
 using System.Globalization;
 using FluentAssertions;
+using SqlQueryStress.Services.BenchmarkExportService;
 using BenchmarkResultModel = SqlQueryStress.Services.BenchmarkExportService.BenchmarkResult;
-using BenchmarkExportService = SqlQueryStress.Services.BenchmarkExportService.BenchmarkExportService;
 
-namespace SqlQueryStress.Tests.Services;
+namespace SqlQueryStress.UnitTests.ServiceTests;
 
 public class BenchmarkExportServiceTests
 {
