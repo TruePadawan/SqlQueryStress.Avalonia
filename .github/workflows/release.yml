@@ -1,0 +1,89 @@
+name: Build and Release SqlQueryStress
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers ONLY when a tag starting with 'v' (e.g., v1.0.0) is pushed
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0'
+
+      - name: Cache NuGet Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Run All Tests
+        run: dotnet test --verbosity normal
+
+  build-and-release:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for creating the GitHub Release
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0'
+
+      - name: Cache NuGet Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Setup Ruby (Required for fpm)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm zip libarchive-tools zstd
+          gem install fpm
+
+      - name: Make scripts executable
+        run: |
+          chmod +x ./deploy_linux.sh
+          chmod +x ./deploy_windows.sh
+
+      - name: Extract Clean Version Number
+        run: |
+          CLEAN_VERSION=${GITHUB_REF_NAME#v}
+          echo "APP_VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
+
+      - name: Run Deployment Scripts with Tag Version
+        run: |
+          echo "Building SqlQueryStress version $APP_VERSION"
+          ./deploy_linux.sh "$APP_VERSION"
+          ./deploy_windows.sh "$APP_VERSION"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "SqlQueryStress ${{ github.ref_name }}"
+          files: |
+            releases/linux/*
+            releases/windows/*
+          generate_release_notes: true
