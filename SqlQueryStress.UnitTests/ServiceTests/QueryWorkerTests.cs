@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
 
-namespace SqlQueryStress.Tests.Services.LoadEngine;
+namespace SqlQueryStress.UnitTests.ServiceTests;
 
 public class QueryWorkerTests
 {
@@ -104,8 +104,8 @@ public class QueryWorkerTests
 
         var rows = new object?[][]
         {
-            new object?[] { 101 },
-            new object?[] { 202 }
+            [101],
+            [202]
         };
 
         var paramServer = new ParamServer(parameterTemplates, rows);
@@ -290,7 +290,7 @@ public class QueryWorkerTests
             queryDelay: 0,
             cancellationToken: cancellationSource.Token
         );
-        
+
         worker.Run();
 
         executionCount.Should().Be(0);
