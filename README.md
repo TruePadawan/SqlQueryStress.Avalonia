@@ -2,6 +2,9 @@
 
 **SqlQueryStress** is a cross-platform SQL Server benchmarking tool that lets you stress-test T-SQL queries with configurable concurrency, iterations, and parameter substitution. It is an [Avalonia](https://avaloniaui.net) port of the original Windows-only SqlQueryStress application, built as part of the [Avalonia Port Challenge](https://avaloniaui.net/blog/avalonia-port-challenge).
 
+<img width="1894" height="1025" alt="image" src="https://github.com/user-attachments/assets/e86cfffc-31ba-49d6-98f6-729bf8f00e9f" />
+<img width="1894" height="1025" alt="image" src="https://github.com/user-attachments/assets/bffe0b5d-b3ef-4571-9b68-e2260af4c151" />
+
 ## Features
 
 - **Multi-threaded query execution** : Run the same query across multiple threads with a configurable number of iterations per thread.
