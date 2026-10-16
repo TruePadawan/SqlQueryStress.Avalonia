@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <!-- Display and Identity -->
+        <key>CFBundleName</key>
+        <string>SqlQueryStress</string>
+
+        <key>CFBundleDisplayName</key>
+        <string>SqlQueryStress</string>
+
+        <key>CFBundleIdentifier</key>
+        <string>com.sqlquerystress.app</string>
+
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+
+        <key>CFBundleSignature</key>
+        <string>????</string>
+
+        <!-- Executable Binary (Must match the exact output binary name in Contents/MacOS/) -->
+        <key>CFBundleExecutable</key>
+        <string>SqlQueryStress</string>
+
+        <!-- Application Icon (Must match the exact filename in Contents/Resources/) -->
+        <key>CFBundleIconFile</key>
+        <string>SqlQueryStress.icns</string>
+
+        <!-- Versioning -->
+        <key>CFBundleShortVersionString</key>
+        <string>__VERSION__</string>
+
+        <key>CFBundleVersion</key>
+        <string>__VERSION__</string>
+
+        <!-- Rendering & Display -->
+        <key>NSHighResolutionCapable</key>
+        <true/>
+
+        <!-- Minimum OS Version (macOS 11 Big Sur covers all modern .NET runtime targets) -->
+        <key>LSMinimumSystemVersion</key>
+        <string>11.0</string>
+
+        <!-- System Appearance Support -->
+        <key>NSRequiresAquaSystemAppearance</key>
+        <false/>
+    </dict>
+</plist>
