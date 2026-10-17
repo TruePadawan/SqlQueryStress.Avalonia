@@ -72,9 +72,9 @@
 
             <!-- Links -->
             <Separator Width="300" Margin="0,4,0,4" />
-            <HyperlinkButton NavigateUri="https://github.com/TruePadawan/SqlQueryStress"
+            <HyperlinkButton NavigateUri="https://github.com/TruePadawan/SqlQueryStress.Avalonia"
                              Content="GitHub Repository" />
-            <HyperlinkButton NavigateUri="https://github.com/TruePadawan/SqlQueryStress/issues"
+            <HyperlinkButton NavigateUri="https://github.com/TruePadawan/SqlQueryStress.Avalonia/issues"
                              Content="Report an Issue" />
         </StackPanel>
     </DockPanel>

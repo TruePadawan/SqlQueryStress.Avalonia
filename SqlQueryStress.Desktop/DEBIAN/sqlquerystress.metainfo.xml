@@ -43,8 +43,8 @@
         <keyword>sqlserver</keyword>
     </keywords>
 
-    <url type="homepage">https://github.com/TruePadawan/SqlQueryStress</url>
-    <url type="bugtracker">https://github.com/TruePadawan/SqlQueryStress/issues</url>
+    <url type="homepage">https://github.com/TruePadawan/SqlQueryStress.Avalonia</url>
+    <url type="bugtracker">https://github.com/TruePadawan/SqlQueryStress.Avalonia/issues</url>
 
     <content_rating type="oars-1.1"/>
 
