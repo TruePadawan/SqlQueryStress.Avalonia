@@ -26,6 +26,12 @@ using SqlQueryStress.Services.SettingsFileService;
 
 namespace SqlQueryStress.ViewModels;
 
+// Throttle interval for UI progress updates (milliseconds)
+internal static class UiThrottle
+{
+    internal const int IntervalMs = 100;
+}
+
 public partial class MainViewModel : ViewModelBase
 {
     private const string AppTitle = "SqlQueryStress";
@@ -93,6 +99,15 @@ public partial class MainViewModel : ViewModelBase
     private Guid _testGuid;
     private DateTime _testStartTime;
     private BenchmarkResult? _lastResult;
+
+    // Throttled UI progress update state
+    private readonly object _throttleLock = new();
+    private long _lastUiUpdateTicks;
+    private LoadEngine? _pendingEngine;
+    private Stopwatch? _pendingStopwatch;
+    private int _pendingThreadCount;
+    private int _pendingIterations;
+    private int _pendingRunVersion;
 
     public MainViewModel(
         IQuerySettingsService querySettingsService,
@@ -213,11 +228,11 @@ public partial class MainViewModel : ViewModelBase
             if (activeMappings.Count > 0)
             {
                 var paramConnectionInfo = (_dbConnectionService.ShareDbSettings
-                    ? _dbConnectionService.MainDbConnectionInfo
-                    : _dbConnectionService.ParamDbConnectionInfo) with
-                {
-                    EnablePooling = _optionsService.EnableConnectionPooling
-                };
+                        ? _dbConnectionService.MainDbConnectionInfo
+                        : _dbConnectionService.ParamDbConnectionInfo) with
+                    {
+                        EnablePooling = _optionsService.EnableConnectionPooling
+                    };
 
                 paramServer = await ParamServer.CreateAsync(
                     _parameterSubstitutionService.ParameterQuery,
@@ -248,8 +263,7 @@ public partial class MainViewModel : ViewModelBase
                     cancellationToken: cancellationToken,
                     collectIoStats: collectIoStats,
                     collectTimeStats: collectTimeStats,
-                    forceDataRetrieval: _optionsService.ForceClientRetrievalOfData,
-                    killQueriesOnCancel: _optionsService.KillQueriesOnCancel);
+                    forceDataRetrieval: _optionsService.ForceClientRetrievalOfData);
 
                 engine.AddWorker(worker);
             }
@@ -258,7 +272,7 @@ public partial class MainViewModel : ViewModelBase
             engine.Start();
 
             // The engine's workers still run on their own dedicated Threads.
-            await Task.Run(engine.WaitForCompletion);
+            await Task.Run(engine.WaitForCompletion, cancellationToken);
         }
         catch (Exception exception)
         {
@@ -269,6 +283,9 @@ public partial class MainViewModel : ViewModelBase
         {
             stopwatch.Stop();
             SqlConnection.ClearAllPools();
+
+            // Flush the final UI state so the last progress update is not lost
+            FlushPendingUiUpdate(engine, stopwatch, threadCount, iterations, runVersion);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -346,7 +363,8 @@ public partial class MainViewModel : ViewModelBase
         catch (Exception exception)
         {
             Console.WriteLine($"Could not save benchmark, {exception.Message}");
-            await NotifyAsync($"Error While Saving Benchmark: make sure you have write privileges to '{file.Name}'", AppTitle);
+            await NotifyAsync($"Error While Saving Benchmark: make sure you have write privileges to '{file.Name}'",
+                AppTitle);
         }
     }
 
@@ -371,7 +389,8 @@ public partial class MainViewModel : ViewModelBase
         catch (Exception exception)
         {
             Console.WriteLine($"Could not save benchmark, {exception.Message}");
-            await NotifyAsync($"Error While Saving Benchmark: make sure you have write privileges to '{file.Name}'", AppTitle);
+            await NotifyAsync($"Error While Saving Benchmark: make sure you have write privileges to '{file.Name}'",
+                AppTitle);
         }
     }
 
@@ -471,6 +490,8 @@ public partial class MainViewModel : ViewModelBase
 
     /// <summary>
     /// Stores a worker output and refreshes the statistics on the UI thread.
+    /// UI updates are throttled to at most once per <c>UiThrottle.IntervalMs</c> to prevent
+    /// dispatcher starvation during high-frequency query completions.
     /// </summary>
     private void PublishOutput(
         LoadEngine engine,
@@ -482,16 +503,105 @@ public partial class MainViewModel : ViewModelBase
     {
         engine.PublishOutput(output);
 
-        _ = Dispatcher.UIThread.InvokeAsync(() =>
+        // Always record exceptions immediately (not throttled)
+        if (output.Error is not null)
+            RecordException(output.Error);
+
+        // Throttle UI updates: cache the latest state and only dispatch when the interval elapses
+        lock (_throttleLock)
         {
-            if (runVersion != Volatile.Read(ref _runVersion))
+            _pendingEngine = engine;
+            _pendingStopwatch = stopwatch;
+            _pendingThreadCount = threadCount;
+            _pendingIterations = iterations;
+            _pendingRunVersion = runVersion;
+        }
+
+        var now = Stopwatch.GetTimestamp();
+        var intervalTicks = (long)(Stopwatch.Frequency * UiThrottle.IntervalMs / 1000.0);
+
+        lock (_throttleLock)
+        {
+            if (now - _lastUiUpdateTicks < intervalTicks)
                 return;
 
-            if (output.Error is not null)
-                RecordException(output.Error);
+            _lastUiUpdateTicks = now;
+        }
 
-            UpdateStatistics(engine.Outputs, stopwatch.Elapsed, threadCount, iterations, engine.ActiveThreadCount);
-        });
+        // Fire-and-forget at Background priority so user input and window rendering take precedence
+        Dispatcher.UIThread.Post(() =>
+        {
+            LoadEngine? pendingEngine;
+            Stopwatch? pendingStopwatch;
+            int pendingThreadCount;
+            int pendingIterations;
+            int pendingRunVersion;
+
+            lock (_throttleLock)
+            {
+                pendingEngine = _pendingEngine;
+                pendingStopwatch = _pendingStopwatch;
+                pendingThreadCount = _pendingThreadCount;
+                pendingIterations = _pendingIterations;
+                pendingRunVersion = _pendingRunVersion;
+            }
+
+            if (pendingRunVersion != Volatile.Read(ref _runVersion))
+                return;
+
+            if (pendingEngine is not null && pendingStopwatch is not null)
+            {
+                UpdateStatistics(pendingEngine.Outputs, pendingStopwatch.Elapsed, pendingThreadCount, pendingIterations,
+                    pendingEngine.ActiveThreadCount);
+            }
+        }, DispatcherPriority.Background);
+    }
+
+    /// <summary>
+    /// Flushes the latest throttled UI state immediately (called when all workers complete).
+    /// </summary>
+    private void FlushPendingUiUpdate(
+        LoadEngine engine,
+        Stopwatch stopwatch,
+        int threadCount,
+        int iterations,
+        int runVersion)
+    {
+        lock (_throttleLock)
+        {
+            _pendingEngine = engine;
+            _pendingStopwatch = stopwatch;
+            _pendingThreadCount = threadCount;
+            _pendingIterations = iterations;
+            _pendingRunVersion = runVersion;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            LoadEngine? pendingEngine;
+            Stopwatch? pendingStopwatch;
+            int pendingThreadCount;
+            int pendingIterations;
+            int pendingRunVersion;
+
+            lock (_throttleLock)
+            {
+                pendingEngine = _pendingEngine;
+                pendingStopwatch = _pendingStopwatch;
+                pendingThreadCount = _pendingThreadCount;
+                pendingIterations = _pendingIterations;
+                pendingRunVersion = _pendingRunVersion;
+            }
+
+            if (pendingRunVersion != Volatile.Read(ref _runVersion))
+                return;
+
+            if (pendingEngine is not null && pendingStopwatch is not null)
+            {
+                UpdateStatistics(pendingEngine.Outputs, pendingStopwatch.Elapsed, pendingThreadCount, pendingIterations,
+                    pendingEngine.ActiveThreadCount);
+            }
+        }, DispatcherPriority.Background);
     }
 
     /// <summary>
@@ -560,15 +670,18 @@ public partial class MainViewModel : ViewModelBase
             outputs.Sum(output => output.Time.TotalSeconds) / divisor).ToString("F3");
 
         AverageCpuSecondsText = (
-            outputsWithTimeStatistics.Sum(output => output.CpuTime) / (double)timeStatisticsDivisor / 1000).ToString("F3");
+                outputsWithTimeStatistics.Sum(output => output.CpuTime) / (double)timeStatisticsDivisor / 1000)
+            .ToString("F3");
 
         AverageLogicalReadsText = (
             outputsWithIoStatistics.Sum(output => output.LogicalReads) / (double)ioStatisticsDivisor).ToString("F1");
 
         AverageActualSecondsText = (
-            outputsWithTimeStatistics.Sum(output => output.ElapsedTime) / (double)timeStatisticsDivisor / 1000).ToString("F3");
+                outputsWithTimeStatistics.Sum(output => output.ElapsedTime) / (double)timeStatisticsDivisor / 1000)
+            .ToString("F3");
 
-        ActiveThreadsText = Math.Max(0, activeThreadCount ?? threadCount - outputs.Count(output => output.Finished)).ToString();
+        ActiveThreadsText = Math.Max(0, activeThreadCount ?? threadCount - outputs.Count(output => output.Finished))
+            .ToString();
 
         var total = threadCount * iterations;
         ProgressMaximum = Math.Max(1, total);
