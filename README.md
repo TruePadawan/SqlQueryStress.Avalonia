@@ -15,7 +15,7 @@
 - **Benchmark export** : Save benchmark results to plain text, CSV, or copy to the clipboard.
 - **Settings persistence** : Save and load configuration (connection info, query, iterations, threads, etc.) as JSON files.
 - **Cancellation support** : Cancel a running benchmark at any time, with an option to kill active queries on the server.
-- **Cross-platform** : Built on Avalonia UI, targeting .NET 10.0, with Desktop support and Android/iOS projects in the solution.
+- **Cross-platform** : Built on Avalonia UI, targeting .NET 10.0, with Windows and Linux support.
 
 ## Database Support
 
