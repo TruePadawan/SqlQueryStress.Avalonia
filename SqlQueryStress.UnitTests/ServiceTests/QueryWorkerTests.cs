@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Diagnostics;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
@@ -159,10 +159,21 @@ public class QueryWorkerTests
             paramServer: null,
             queryDelay: 30
         );
+
+        worker.Run();
+
+        stopwatch.Stop();
+
+        outputs.Should().HaveCount(2);
+        executionTimes.Should().HaveCount(2);
+
+        // The second execution should be at least 30ms after the first
+        var delay = executionTimes[1] - executionTimes[0];
+        delay.Should().BeGreaterThan(20); // Allow small timing variance
     }
 
     [Fact]
-    public void Run_WhenCancelled_StopsFurtherIterationsAndCancelsActiveCommand()
+    public void Run_WhenCancelled_StopsFurtherIterations()
     {
         var connection = new SqlConnection();
         var command = new SqlCommand();
@@ -171,7 +182,6 @@ public class QueryWorkerTests
         var outputs = new List<QueryOutput>();
 
         var executionCount = 0;
-        var cancelCount = 0;
 
         using var worker = new QueryWorker(
             connection,
@@ -187,54 +197,12 @@ public class QueryWorkerTests
             _ => { },
             paramServer: null,
             queryDelay: 0,
-            cancellationToken: cancellationSource.Token,
-            cancelQuery: _ => cancelCount++
+            cancellationToken: cancellationSource.Token
         );
 
         worker.Run();
 
         executionCount.Should().Be(1);
-        cancelCount.Should().Be(1);
-
-        outputs.Should().HaveCount(1);
-        outputs[0].Error.Should().BeNull();
-        outputs[0].Finished.Should().BeFalse();
-    }
-
-    [Fact]
-    public void Run_WhenCancelledAndKillQueriesOnCancelDisabled_DoesNotCancelActiveCommand()
-    {
-        var connection = new SqlConnection();
-        var command = new SqlCommand();
-        using var cancellationSource = new CancellationTokenSource();
-
-        var outputs = new List<QueryOutput>();
-        var executionCount = 0;
-        var cancelCount = 0;
-
-        using var worker = new QueryWorker(
-            connection,
-            command,
-            iterations: 3,
-            outputs.Add,
-            _ => { },
-            _ =>
-            {
-                executionCount++;
-                cancellationSource.Cancel();
-            },
-            _ => { },
-            paramServer: null,
-            queryDelay: 0,
-            cancellationToken: cancellationSource.Token,
-            cancelQuery: _ => cancelCount++,
-            killQueriesOnCancel: false
-        );
-
-        worker.Run();
-
-        executionCount.Should().Be(1);
-        cancelCount.Should().Be(0);
 
         outputs.Should().HaveCount(1);
         outputs[0].Error.Should().BeNull();

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using SqlQueryStress.Services.LoadEngine;
 
@@ -28,9 +28,9 @@ public class LoadEngineTests
                     lock (outputLock)
                         outputs.Add(output);
                 },
-                openConnection: _ => { },
-                executeQuery: _ => { },
-                closeConnection: _ => { },
+                _ => { },
+                _ => { },
+                _ => { },
                 paramServer: null
             );
 
@@ -58,13 +58,13 @@ public class LoadEngineTests
             command,
             iterations: 1,
             _ => { },
-            openConnection: _ => { },
-            executeQuery: _ =>
+            _ => { },
+            _ =>
             {
                 Thread.Sleep(100);
                 executionCompleted = true;
             },
-            closeConnection: _ => { },
+            _ => { },
             paramServer: null
         );
 
@@ -89,9 +89,9 @@ public class LoadEngineTests
             command,
             iterations: 2,
             engine.PublishOutput,
-            openConnection: _ => { },
-            executeQuery: _ => { },
-            closeConnection: _ => { },
+            _ => { },
+            _ => { },
+            _ => { },
             paramServer: null
         );
 
