@@ -22,11 +22,11 @@
 ### macOS
 
 > [!IMPORTANT]
-> **macOS Users:** Please do not download the `.zip` archive directly from the GitHub Releases page via a web browser. Because this open-source application is not notarized with a paid Apple Developer account, macOS Gatekeeper flags browser downloads with an *"App is damaged and can't be opened"* error. Instead, install using either the one-line terminal installer or Homebrew below so the app launches cleanly out of the box:
+> **macOS Users:** Do not download the `.zip` archive directly from the GitHub Releases page via a web browser. Because this open-source application is not notarized with a paid Apple Developer account, macOS Gatekeeper flags browser downloads with an *"App is damaged and can't be opened"* error. Instead, install using either the one-line terminal installer or Homebrew below so the app launches cleanly out of the box:
 
-#### Option 1: One-Line Terminal Installer (Recommended — No Homebrew Required)
+#### Option 1: One-Line Terminal Installer (Recommended)
 
-Automatically detects your Mac architecture (Apple Silicon / MacBook Neo / Intel), installs `SqlQueryStress.app` to `/Applications`, clears Gatekeeper quarantine flags, and launches the app:
+Automatically detects your Mac type (Apple Silicon / MacBook Neo / Intel), installs `SqlQueryStress.app` to `/Applications`, clears Gatekeeper quarantine flags, and launches the app:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TruePadawan/SqlQueryStress.Avalonia/master/scripts/install_mac.sh | bash
