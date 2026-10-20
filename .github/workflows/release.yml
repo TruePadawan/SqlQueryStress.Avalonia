@@ -66,9 +66,9 @@ jobs:
 
       - name: Make scripts executable
         run: |
-          chmod +x ./deploy_linux.sh
-          chmod +x ./deploy_windows.sh
-          chmod +x ./deploy_mac.sh
+          chmod +x ./scripts/deploy_linux.sh
+          chmod +x ./scripts/deploy_windows.sh
+          chmod +x ./scripts/deploy_mac.sh
 
       - name: Extract Clean Version Number
         run: |
@@ -78,9 +78,9 @@ jobs:
       - name: Run Deployment Scripts with Tag Version
         run: |
           echo "Building SqlQueryStress version $APP_VERSION"
-          ./deploy_linux.sh "$APP_VERSION"
-          ./deploy_windows.sh "$APP_VERSION"
-          ./deploy_mac.sh "$APP_VERSION"
+          ./scripts/deploy_linux.sh "$APP_VERSION"
+          ./scripts/deploy_windows.sh "$APP_VERSION"
+          ./scripts/deploy_mac.sh "$APP_VERSION"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

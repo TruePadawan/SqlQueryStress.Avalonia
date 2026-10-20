@@ -10,15 +10,6 @@ fi
 RIDS=("osx-arm64" "osx-x64")
 mkdir -p releases/macos
 
-# Download standalone rcodesign binary for Linux if not already cached
-RCODESIGN_BIN="/tmp/rcodesign"
-if [ ! -f "$RCODESIGN_BIN" ]; then
-  echo "Downloading rcodesign for macOS ad-hoc bundle signing..."
-  curl -sSL https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.29.0/apple-codesign-0.29.0-x86_64-unknown-linux-musl.tar.gz \
-    | tar -xz -C /tmp --strip-components=1 apple-codesign-0.29.0-x86_64-unknown-linux-musl/rcodesign
-  chmod +x "$RCODESIGN_BIN"
-fi
-
 for RID in "${RIDS[@]}"; do
   echo "=========================================="
   echo " Packaging SqlQueryStress for $RID"
@@ -67,11 +58,7 @@ for RID in "${RIDS[@]}"; do
     echo "Warning: packaging/macos/SqlQueryStress.icns not found! Skipping..."
   fi
 
-  # 6. Ad-hoc sign the entire .app bundle so macOS Gatekeeper doesn't report it as "damaged"
-  echo "Signing $APP_DIR with rcodesign..."
-  "$RCODESIGN_BIN" sign "$APP_DIR"
-
-  # 7. Archive bundle into .zip for GitHub Release distribution
+  # 6. Archive bundle into .zip for GitHub Release distribution
   ARCHIVE_NAME="SqlQueryStress-${APP_VERSION}-${RID}.zip"
   (cd "$STAGING_DIR" && zip -ry "../../releases/macos/$ARCHIVE_NAME" "SqlQueryStress.app")
   echo "Created: releases/macos/$ARCHIVE_NAME"

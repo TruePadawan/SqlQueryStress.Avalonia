@@ -15,7 +15,39 @@
 - **Benchmark export** : Save benchmark results to plain text, CSV, or copy to the clipboard.
 - **Settings persistence** : Save and load configuration (connection info, query, iterations, threads, etc.) as JSON files.
 - **Cancellation support** : Cancel a running benchmark at any time, with an option to kill active queries on the server.
-- **Cross-platform** : Built on Avalonia UI, targeting .NET 10.0, with Windows and Linux support.
+- **Cross-platform** : Built on Avalonia UI, targeting .NET 10.0, with Windows, Linux, and macOS support.
+
+## Installation
+
+### macOS
+
+> [!IMPORTANT]
+> **macOS Users:** Please do not download the `.zip` archive directly from the GitHub Releases page via a web browser. Because this open-source application is not notarized with a paid Apple Developer account, macOS Gatekeeper flags browser downloads with an *"App is damaged and can't be opened"* error. Instead, install using either the one-line terminal installer or Homebrew below so the app launches cleanly out of the box:
+
+#### Option 1: One-Line Terminal Installer (Recommended — No Homebrew Required)
+
+Automatically detects your Mac architecture (Apple Silicon / MacBook Neo / Intel), installs `SqlQueryStress.app` to `/Applications`, clears Gatekeeper quarantine flags, and launches the app:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TruePadawan/SqlQueryStress.Avalonia/master/scripts/install_mac.sh | bash
+```
+
+#### Option 2: Homebrew Cask
+
+```bash
+# 1. Tap this repository
+brew tap truepadawan/sqlquerystress https://github.com/TruePadawan/SqlQueryStress.Avalonia
+
+# 2. Trust the third-party tap (if prompted by your Homebrew version)
+brew trust truepadawan/sqlquerystress.avalonia
+
+# 3. Install SqlQueryStress
+brew install --cask sqlquerystress
+```
+
+### Windows & Linux
+
+Download the latest prebuilt installer or archive for your platform (`win-x64`, `win-arm64`, `.deb`, `.rpm`, or `.tar.gz`) directly from the [Releases](../../releases) page.
 
 ## Database Support
 
@@ -31,7 +63,7 @@
   - Custom additional connection string parameters
   - Connection pooling toggle
 
-## Requirements
+## Requirements (Building from Source)
 
 - **.NET 10.0 SDK** or later
 - **SQL Server** instance (local, remote, or Azure SQL Database)
