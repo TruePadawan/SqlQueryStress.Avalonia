@@ -11,21 +11,20 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.AvaloniaEdit" />
+        <PackageReference Include="Avalonia.AvaloniaEdit"/>
         <PackageReference Include="Avalonia.Themes.Fluent"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
-        <PackageReference Include="AvaloniaEdit.TextMate" />
+        <PackageReference Include="AvaloniaEdit.TextMate"/>
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm"/>
-        <PackageReference Include="Microsoft.Data.SqlClient" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="Microsoft.Data.SqlClient"/>
+        <PackageReference Include="System.Security.Cryptography.Pkcs"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
     </ItemGroup>
-
-
     <ItemGroup>
-        <InternalsVisibleTo Include="SqlQueryStress.UnitTests" />
+        <InternalsVisibleTo Include="SqlQueryStress.UnitTests"/>
     </ItemGroup>
 </Project>
