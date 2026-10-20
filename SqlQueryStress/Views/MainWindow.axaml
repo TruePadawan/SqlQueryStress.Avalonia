@@ -30,7 +30,7 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Help">
                 <NativeMenu>
-                    <NativeMenuItem Header="About" />
+                    <NativeMenuItem Header="About" Click="AboutMenuItem_OnClick" />
                 </NativeMenu>
             </NativeMenuItem>
         </NativeMenu>
