@@ -2,11 +2,11 @@ cask "sqlquerystress" do
   version "0.1.0-beta"
 
   on_arm do
-    sha256 "9d9c3624ff605b2a33659a111fe38e8a3418a17f549107a9f4f0898dbf591950"
+    sha256 "1bf19d8b074afc34ce77f60b26f99c92d9e601ef686e9922f1a92894444167af"
     url "https://github.com/TruePadawan/SqlQueryStress.Avalonia/releases/download/v#{version}/SqlQueryStress-#{version}-osx-arm64.zip"
   end
   on_intel do
-    sha256 "adbb84c562ba936c27b42d30ab9e1e96faa115d44eeb63c270ce5fd4350e3b1b"
+    sha256 "a0cdc81b0554d0cf7e2a8c926555ca094474edfc197013e23c16e714385be30b"
     url "https://github.com/TruePadawan/SqlQueryStress.Avalonia/releases/download/v#{version}/SqlQueryStress-#{version}-osx-x64.zip"
   end
 
