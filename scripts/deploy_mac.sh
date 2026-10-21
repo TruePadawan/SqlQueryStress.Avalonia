@@ -22,22 +22,26 @@ for RID in "${RIDS[@]}"; do
   # Clean any stale staging build
   rm -rf "$STAGING_DIR"
 
-  # 1. Publish Desktop executable
+  # 1. Build .app bundle directory layout FIRST
+  mkdir -p "$APP_DIR/Contents/MacOS"
+  mkdir -p "$APP_DIR/Contents/Resources"
+
+  # 2. Publish Desktop executable directly into Contents/MacOS
   dotnet publish SqlQueryStress.Desktop/SqlQueryStress.Desktop.csproj \
     -c Release \
     -r "$RID" \
     --self-contained true \
-    -p:PublishSingleFile=true \
+    -p:PublishTrimmed=false \
     -p:Version="$APP_VERSION" \
-    -o "$STAGING_DIR/bin"
+    -o "$APP_DIR/Contents/MacOS"
 
-  # 2. Build .app bundle directory layout FIRST
-  mkdir -p "$APP_DIR/Contents/MacOS"
-  mkdir -p "$APP_DIR/Contents/Resources"
-
-  # 3. Copy and rename the binary into the .app bundle
-  cp "$STAGING_DIR/bin/SqlQueryStress.Desktop" "$APP_DIR/Contents/MacOS/SqlQueryStress"
+  # 3. Rename the native apphost executable to match CFBundleExecutable (SqlQueryStress)
+  mv "$APP_DIR/Contents/MacOS/SqlQueryStress.Desktop" "$APP_DIR/Contents/MacOS/SqlQueryStress"
   chmod +x "$APP_DIR/Contents/MacOS/SqlQueryStress"
+  chmod +x "$APP_DIR/Contents/MacOS/"*.dylib 2>/dev/null || true
+
+  # Optional: Remove .pdb debug files to keep the zip lightweight
+  rm -f "$APP_DIR/Contents/MacOS/"*.pdb
 
   # 4. Dynamic Version Replacement into Info.plist using sed
   if [ -f packaging/macos/Info.plist ]; then

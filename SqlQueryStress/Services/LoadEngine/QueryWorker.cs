@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
@@ -25,7 +25,6 @@ internal sealed class QueryWorker : IDisposable
     private readonly Action<SqlConnection> _closeConnection;
 
     private readonly CancellationToken _cancellationToken;
-    private readonly Action<SqlCommand> _cancelQuery;
 
     private static readonly Regex FindReads = new(
         @"logical reads\s+(\d+)",
@@ -40,7 +39,6 @@ internal sealed class QueryWorker : IDisposable
     private readonly bool _collectIoStats;
     private readonly bool _collectTimeStats;
     private readonly bool _forceDataRetrieval;
-    private readonly bool _killQueriesOnCancel;
 
     private QueryOutput? _currentOutput;
 
@@ -54,8 +52,7 @@ internal sealed class QueryWorker : IDisposable
         CancellationToken cancellationToken = default,
         bool collectIoStats = false,
         bool collectTimeStats = false,
-        bool forceDataRetrieval = false,
-        bool killQueriesOnCancel = true
+        bool forceDataRetrieval = false
     )
         : this(
             connection,
@@ -68,11 +65,9 @@ internal sealed class QueryWorker : IDisposable
             paramServer,
             queryDelay,
             cancellationToken,
-            static command => command.Cancel(),
             collectIoStats,
             collectTimeStats,
-            forceDataRetrieval,
-            killQueriesOnCancel
+            forceDataRetrieval
         )
     {
     }
@@ -88,11 +83,9 @@ internal sealed class QueryWorker : IDisposable
         ParamServer? paramServer,
         int queryDelay = 0,
         CancellationToken cancellationToken = default,
-        Action<SqlCommand>? cancelQuery = null,
         bool collectIoStats = false,
         bool collectTimeStats = false,
-        bool forceDataRetrieval = false,
-        bool killQueriesOnCancel = true
+        bool forceDataRetrieval = false
     )
     {
         ArgumentNullException.ThrowIfNull(connection);
@@ -115,7 +108,6 @@ internal sealed class QueryWorker : IDisposable
         _paramServer = paramServer;
         _queryDelay = queryDelay;
         _cancellationToken = cancellationToken;
-        _cancelQuery = cancelQuery ?? (Action<SqlCommand>)(static command => command.Cancel());
 
         _openConnection = openConnection;
         _executeQuery = executeQuery;
@@ -126,7 +118,6 @@ internal sealed class QueryWorker : IDisposable
         _collectIoStats = collectIoStats;
         _collectTimeStats = collectTimeStats;
         _forceDataRetrieval = forceDataRetrieval;
-        _killQueriesOnCancel = killQueriesOnCancel;
 
         if (_paramServer is not null)
         {
@@ -206,29 +197,17 @@ internal sealed class QueryWorker : IDisposable
 
         do
         {
-            while (!_cancellationToken.IsCancellationRequested && reader.Read())
+            while (reader.Read())
             {
                 // access a column to force the result data to be retrieved
                 if (reader.FieldCount > 0)
                     _ = reader.GetValue(0);
             }
-        } while (!_cancellationToken.IsCancellationRequested && reader.NextResult());
+        } while (reader.NextResult());
     }
 
     internal void Run()
     {
-        var queryExecuting = 0;
-
-        // Cancellation can arrive from another thread
-        // only cancel the command while query execution is in progress
-        using var cancellationRegistration =
-            _cancellationToken.Register(() =>
-                {
-                    if (_killQueriesOnCancel && Volatile.Read(location: ref queryExecuting) == 1)
-                        _cancelQuery(_queryCommand);
-                }
-            );
-
         for (var i = 0; i < _iterations; i++)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -274,8 +253,6 @@ internal sealed class QueryWorker : IDisposable
 
                 try
                 {
-                    Volatile.Write(location: ref queryExecuting, value: 1);
-
                     // Exclude connection setup and parameter rotation from client-side time
                     stopwatch.Start();
                     ExecuteQuery();
@@ -283,7 +260,6 @@ internal sealed class QueryWorker : IDisposable
                 finally
                 {
                     stopwatch.Stop();
-                    Volatile.Write(location: ref queryExecuting, value: 0);
 
                     if (collectStatistics)
                         _connection.InfoMessage -= GetInfoMessages;
@@ -293,31 +269,26 @@ internal sealed class QueryWorker : IDisposable
             }
             catch (Exception exception)
             {
-                if (!_cancellationToken.IsCancellationRequested)
-                    output.Error = exception;
+                output.Error = exception;
             }
             finally
             {
                 output.Time = stopwatch.Elapsed;
-                output.Finished =
-                    i == _iterations - 1;
+                output.Finished = i == _iterations - 1;
 
                 _currentOutput = null;
-                Volatile.Write(ref queryExecuting, 0);
                 _closeConnection(_connection);
             }
 
             _publishOutput(output);
 
-            // cancellation might have occured while opening the connection
+            // cancellation might have occurred while opening the connection
             // or preparing the next parameter row
             if (_cancellationToken.IsCancellationRequested)
                 break;
 
-            // use a cancellation-aware wait so that a worker doesn't remain blocked
-            // in the inter-query delay after the load has been cancelled
-            if (_queryDelay > 0 && i < _iterations - 1 && _cancellationToken.WaitHandle.WaitOne(_queryDelay))
-                break;
+            if (_queryDelay > 0 && i < _iterations - 1)
+                Thread.Sleep(_queryDelay);
         }
     }
 
@@ -335,21 +306,10 @@ internal sealed class QueryWorker : IDisposable
                 : string.Empty
         );
 
-        try
-        {
-            using var statisticsCommand = new SqlCommand(
-                statistics,
-                _connection)
-            {
-                CommandTimeout = _queryCommand.CommandTimeout
-            };
+        using var statisticsCommand = new SqlCommand(statistics, _connection);
+        statisticsCommand.CommandTimeout = _queryCommand.CommandTimeout;
 
-            statisticsCommand.ExecuteNonQuery();
-        }
-        catch (Exception) when (_cancellationToken.IsCancellationRequested)
-        {
-            // The connection is about to be closed; don't let cleanup mask cancellation.
-        }
+        statisticsCommand.ExecuteNonQuery();
     }
 
     public void Dispose()

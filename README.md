@@ -15,7 +15,39 @@
 - **Benchmark export** : Save benchmark results to plain text, CSV, or copy to the clipboard.
 - **Settings persistence** : Save and load configuration (connection info, query, iterations, threads, etc.) as JSON files.
 - **Cancellation support** : Cancel a running benchmark at any time, with an option to kill active queries on the server.
-- **Cross-platform** : Built on Avalonia UI, targeting .NET 10.0, with Desktop support in the solution.
+- **Cross-platform** : Built on Avalonia UI, targeting .NET 10.0, with Windows, Linux, and macOS support.
+
+## Installation
+
+### macOS
+
+> [!IMPORTANT]
+> **macOS Users:** Do not download the `.zip` archive directly from the GitHub Releases page via a web browser. Because this open-source application is not notarized with a paid Apple Developer account, macOS Gatekeeper flags browser downloads with an *"App is damaged and can't be opened"* error. Instead, install using either the one-line terminal installer or Homebrew below so the app launches cleanly out of the box:
+
+#### Option 1: One-Line Terminal Installer (Recommended)
+
+Automatically detects your Mac type (Apple Silicon / MacBook Neo / Intel), installs `SqlQueryStress.app` to `/Applications`, clears Gatekeeper quarantine flags, and launches the app:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TruePadawan/SqlQueryStress.Avalonia/master/scripts/install_mac.sh | bash
+```
+
+#### Option 2: Homebrew Cask
+
+```bash
+# 1. Tap this repository
+brew tap truepadawan/sqlquerystress https://github.com/TruePadawan/SqlQueryStress.Avalonia
+
+# 2. Trust the third-party tap (if prompted by your Homebrew version)
+brew trust truepadawan/sqlquerystress.avalonia
+
+# 3. Install SqlQueryStress
+brew install --cask sqlquerystress
+```
+
+### Windows & Linux
+
+Download the latest prebuilt installer or archive for your platform (`win-x64`, `win-arm64`, `.deb`, `.rpm`, or `.tar.gz`) directly from the [Releases](../../releases) page.
 
 ## Database support
 
@@ -31,28 +63,7 @@
   - Custom additional connection string parameters
   - Connection pooling toggle
 
-## Downloads and installation
-
-Download the package for your OS from the [releases page](https://github.com/TruePadawan/SqlQueryStress.Avalonia/releases).
-
-### macOS
-
-The release ships an unsigned, un-notarized `.app` bundle inside the zip, so macOS Gatekeeper will warn that it cannot verify the developer.
-
-1. Download the `osx-arm64` (Apple Silicon) or `osx-x64` (Intel) zip and inspect the archive before running it.
-2. Extract it and move `SqlQueryStress.app` to your `Applications` folder.
-3. Try to open it. If macOS blocks it, you can clear the quarantine attribute for this one app:
-
-   ```bash
-   xattr -dr com.apple.quarantine /Applications/SqlQueryStress.app
-   ```
-
-   Alternatively, right-click the app and choose **Open**, or use **System Settings → Privacy & Security → Open Anyway**.
-
-> [!WARNING]
-> Removing the quarantine attribute weakens a macOS security safeguard **for that downloaded app**. It does **not** sign or notarize the app, and it does not verify that the download is authentic. Only do this if you trust the source and have verified the download. There is no remote installer script in this repository; any command you run should be one you have read and understood.
-
-## Requirements
+## Requirements (Building from Source)
 
 **Application runtime:**
 
