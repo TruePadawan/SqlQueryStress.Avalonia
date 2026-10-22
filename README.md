@@ -5,6 +5,9 @@ configurable concurrency, iterations, and parameter substitution. It is an [Aval
 the original Windows-only [SqlQueryStress](https://github.com/ErikEJ/SqlQueryStress) application, built as part of
 the [Avalonia Port Challenge](https://avaloniaui.net/blog/avalonia-port-challenge).
 
+> **More documentation:** The [repository wiki](../../wiki) contains detailed guides on installation, usage,
+> troubleshooting, exporting benchmarks, database setup, and more.
+
 ## Features
 
 - **Multi-threaded query execution** : Run the same query across multiple threads with a configurable number of
