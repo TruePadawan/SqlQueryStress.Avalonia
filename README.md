@@ -69,11 +69,11 @@ same format for saving/loading settings such that users could use the same setti
 
 ### What Needed Rethinking
 
-- **Decoupling Legacy Code-Behind into MVVM:** The original application had business logic embedded in WPF code-behind
-  files with no testability. We introduced six service interfaces with dedicated implementations, four view models
-  backed by CommunityToolkit.Mvvm's `[ObservableProperty]` and `[RelayCommand]`, dependency injection, and a full xUnit
-  test suite covering the load engine, parameter server, query worker, and export formatting all without requiring a
-  live SQL Server instance.
+- **Decoupling Code-Behind into MVVM:** The original application had business logic embedded in WPF code-behind files
+  with no testability. We introduced six service interfaces with dedicated implementations, four view models backed by
+  CommunityToolkit.Mvvm's `[ObservableProperty]` and `[RelayCommand]`, dependency injection, and a full xUnit test suite
+  covering the load engine, parameter server, query worker, and export formatting all without requiring a live SQL
+  Server instance.
 - **High-Frequency UI Dispatcher Starvation:** During stress testing with 20+ concurrent threads running sub-millisecond
   queries (10,000+ iterations), sending telemetry updates to the UI thread on every single query completion sometimes
   caused noticeable freezes when opening child windows like `DatabaseSelectWindow`. We solved this by throttling and
