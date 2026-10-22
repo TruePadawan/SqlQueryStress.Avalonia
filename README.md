@@ -48,57 +48,57 @@ Shipping from a single .NET 10 codebase across **Linux**, **macOS**, and **Windo
 
 ## Migration Write-Up
 
-We took our time working on the migration from the original Windows desktop application to the modernized Avalonia port.
-We preserved the original functionality while improving on the existing codebase, UI/UX and architecture. Some
-improvements include: adding support for macOS and Linux, re-architecting the application to be more testable and
-maintainable, and adding automatic syncing with the device's system theme. Building the UI was quite seamless with
-Avalonia's layout system, and I particularly liked how easy it was to add automatic light/dark mode with Avalonia.
+We migrated ErikEJ's Windows-only WPF SqlQueryStress to a cross-platform Avalonia 12 application targeting .NET 10,
+preserving all original functionality while rebuilding the entire presentation layer. We added macOS and Linux support,
+introduced a fully testable service-oriented architecture, and added automatic system theme syncing. Building the UI was
+quite seamless with Avalonia's layout system, and we particularly liked how easy it was to add automatic light/dark
+mode.
+
+We preserved the original application's benchmark export formats (plain text, CSV, and clipboard) and maintained the
+same format for saving/loading settings such that users could use the same settings file between the two applications.
 
 ### What Translated Cleanly
 
-- **Zero-Friction .NET Ecosystem Fit:** There was zero friction migrating the business logic into the Avalonia port. Its
-  natural fit with the .NET ecosystem and familiar C# patterns meant we spent no time fighting the framework and much
-  more time verifying behavioural correctness and improving the software itself.
-- **Core SQL Execution & Telemetry Parsing:** The underlying execution model using `Microsoft.Data.SqlClient`,
-  `SqlConnectionStringBuilder`, and regex parsing for `SET STATISTICS IO` and `SET STATISTICS TIME` via
-  `SqlConnection.InfoMessage` migrated cleanly.
-- **Parameter Substitution:** Configuration serialization and the data-driven parameter substitution logic
-  (`ParamServer`) carried over smoothly once decoupled from UI controls.
-- **SQL Syntax Editing:** Replacing the legacy Windows code editor with **AvaloniaEdit** allowed us to preserve full
-  T-SQL syntax highlighting with native Light and Dark mode reactivity.
+- **Data Access Layer Reuse:** The original `Microsoft.Data.SqlClient` execution model required no abstraction layer. We
+  referenced the same NuGet package directly, and the existing pattern for capturing telemetry data during benchmarks
+  worked identically across platforms.
+- **App Settings and Parameter Substitution:** Saving/Loading of the application's settings (to/from JSON) and the
+  data-driven query parameter substitution logic (`ParamServer`) carried over smoothly once decoupled from UI controls.
+- **SQL Syntax Editing:** Replacing **AvalonEdit** text editor with **AvaloniaEdit** allowed us to preserve full T-SQL
+  syntax highlighting with native Light and Dark mode reactivity.
 
 ### What Needed Rethinking
 
-- **Decoupling Legacy Code-Behind into MVVM:** The original application relied heavily on tightly coupled UI
-  code-behind. We re-architected the presentation layer from the ground up using **CommunityToolkit.Mvvm**, dependency
-  injection, and testable services (`QueryWorker`, `LoadEngine`,
-  `BenchmarkExportService`, etc.) backed by an xUnit test suite.
+- **Decoupling Legacy Code-Behind into MVVM:** The original application had business logic embedded in WPF code-behind
+  files with no testability. We introduced six service interfaces with dedicated implementations, four view models
+  backed by CommunityToolkit.Mvvm's `[ObservableProperty]` and `[RelayCommand]`, dependency injection, and a full xUnit
+  test suite covering the load engine, parameter server, query worker, and export formatting all without requiring a
+  live SQL Server instance.
 - **High-Frequency UI Dispatcher Starvation:** During stress testing with 20+ concurrent threads running sub-millisecond
-  queries (10,000+ iterations), sending telemetry updates to the UI thread on every single query completion caused
-  noticeable freezes when opening child windows like `DatabaseSelectWindow`. We solved this by throttling and batching
-  UI telemetry updates and dispatching them at `DispatcherPriority.Background` while ensuring the final state always
-  flushes on completion.
+  queries (10,000+ iterations), sending telemetry updates to the UI thread on every single query completion sometimes
+  caused noticeable freezes when opening child windows like `DatabaseSelectWindow`. We solved this by throttling and
+  batching UI telemetry updates and dispatching them at `DispatcherPriority.Background` while ensuring the final state
+  always flushes on completion.
 
-### What Caught Us by Surprise
+### Quirks
 
-- **Cross-Platform Packaging:** Packaging self-contained builds from a Linux CI environment for Windows, Linux (`.deb`,
-  `.rpm`, `.tar.gz`), and macOS (`.app` bundles for both `osx-arm64` and
-  `osx-x64`) surfaced subtle runtime differences. On macOS, single-file publishing stripped `libSkiaSharp.dylib`
-  resolution, requiring a multi-file `.app` bundle layout inside `Contents/MacOS/`.
+- **Cross-Platform Packaging:** Packaging self-contained builds from a Linux CI environment for Windows, Linux, and
+  macOS surfaced subtle runtime differences. For macOS, single-file publishing (`-p:PublishSingleFile=true`) led to the
+  executable not being able to resolve `libSkiaSharp` at launch so we fixed this by disabling single-file publishing for
+  macOS and bundling the native libraries with the executable.
 - **macOS Gatekeeper Quarantine on Open-Source Builds:** Because open-source builds without a paid Apple Developer ID
-  are flagged as *"damaged"* when downloaded via a web browser due to `com.apple.quarantine`, we automated a **Homebrew
-  Cask** updater directly in our GitHub Actions release pipeline alongside a one-line terminal installer script
-  (`install_mac.sh`) so macOS users on Intel, M-series, and MacBook Neo machines get a zero-friction installation.
+  are flagged as *"damaged"* when downloaded, we automated a **Homebrew Cask** updater directly in our GitHub Actions
+  release pipeline alongside a terminal installer script (`install_mac.sh`) so macOS users on Intel, M-series, and
+  MacBook Neo machines get a zero-friction installation.
 
 ## Installation
 
 ### macOS
 
-> [!IMPORTANT]
 > **macOS Users:** Do not download the `.zip` archive directly from the GitHub Releases page via a web browser. Because
-this open-source application is not notarized with a paid Apple Developer account, macOS Gatekeeper flags browser
-downloads with an *"App is damaged and can't be opened"* error. Instead, install using either the one-line terminal
-installer or Homebrew below so the app launches cleanly out of the box:
+> this open-source application is not notarized with a paid Apple Developer account, macOS Gatekeeper flags browser
+> downloads with an *"App is damaged and can't be opened"* error. Instead, install using either the one-line terminal
+> installer or Homebrew below so the app launches cleanly out of the box:
 
 #### Option 1: One-Line Terminal Installer (Recommended)
 
