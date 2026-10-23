@@ -127,8 +127,7 @@ brew install --cask sqlquerystress
 
 ### Windows & Linux
 
-Download the latest prebuilt installer or archive for your platform (`win-x64`, `win-arm64`, `.deb`, `.rpm`, or
-`.tar.gz`) directly from the [Releases](../../releases) page.
+Download the latest prebuilt installer or archive for your platform directly from the [Releases](../../releases) page.
 
 ## Database support
 
