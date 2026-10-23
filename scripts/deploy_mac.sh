@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+# Resolve the project root directory (parent of the scripts/ directory)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
 # Default to 1.0.0 if no version argument is passed
 APP_VERSION="$1"
 if [ -z "$APP_VERSION" ]; then
