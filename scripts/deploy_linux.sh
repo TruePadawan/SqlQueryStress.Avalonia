@@ -1,9 +1,35 @@
 #!/bin/bash
+set -e
 
 # Resolve the project root directory (parent of the scripts/ directory)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
+
+# Pre-flight checks
+for cmd in dotnet fpm zip; do
+  if ! command -v "$cmd" &>/dev/null; then
+    echo "ERROR: '$cmd' is not installed. Please install it and try again."
+    exit 1
+  fi
+done
+
+# Verify fpm actually works (it may be installed but broken due to Ruby version incompatibility)
+if ! fpm --version &>/dev/null; then
+  echo "ERROR: 'fpm' is installed but failing to run."
+  echo ""
+  echo "This is usually caused by a Ruby version incompatibility."
+  echo "The GitHub Actions workflow uses Ruby 3.2, which is the recommended version."
+  echo ""
+  echo "To fix this, you can:"
+  echo "  1. Install Ruby 3.2 using a version manager (rbenv, rvm, asdf, etc.)"
+  echo "  2. Then reinstall fpm: gem install fpm"
+  echo ""
+  echo "Alternatively, if you have Ruby 3.2 available, you can run:"
+  echo "  ruby-3.2 /usr/local/bin/fpm --version"
+  echo ""
+  exit 1
+fi
 
 # Clean up
 rm -rf ./out/
