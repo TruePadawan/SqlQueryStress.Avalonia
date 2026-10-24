@@ -60,6 +60,15 @@ mode.
 We preserved the original application's benchmark export formats (plain text, CSV, and clipboard) and maintained the
 same format for saving/loading settings such that users could use the same settings file between the two applications.
 
+The migration happened in a couple of distinct phases:
+- Building the Views for each of the windows in the original app
+- Creating the respective ViewModels for some of the Views. The ViewModels were just skeletons at this point
+and was used to map out the data that will be passed to the Views
+- Extracting the business logic from the original app and creating services out of it along with some unit tests
+- Hooking up those services into the ViewModels and verifying that the features work
+- Adding more tests to the test suite
+- Deploying the migrated application
+
 ### What Translated Cleanly
 
 - **Data Access Layer Reuse:** The original `Microsoft.Data.SqlClient` execution model required no abstraction layer. We
